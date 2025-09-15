@@ -170,7 +170,7 @@ const Packages = () => {
         {/* Additional Info */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground mb-4">
-            Toate pachetele includ transport în raza de 50km de București
+            Toate pachetele includ transport în raza de 50km de Iași
           </p>
           <Button variant="outline" className="neon-border hover:glow-effect" onClick={scrollToContact}>
             Solicită Ofertă Personalizată

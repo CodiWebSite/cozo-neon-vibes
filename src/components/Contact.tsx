@@ -62,8 +62,8 @@ const Contact = () => {
     {
       icon: Phone,
       title: "Telefon",
-      detail: "+40 720 123 456",
-      action: "tel:+40720123456"
+      detail: "+40 749 800 325",
+      action: "tel:+40749800325"
     },
     {
       icon: Mail,
@@ -74,7 +74,7 @@ const Contact = () => {
     {
       icon: MapPin,
       title: "Locație",
-      detail: "București, România",
+      detail: "Iași, România",
       action: null
     },
     {
@@ -158,7 +158,7 @@ const Contact = () => {
                       type="tel"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="+40 720 123 456"
+                      placeholder="+40 749 800 325"
                       className="bg-background/50 border-border focus:neon-border"
                     />
                   </div>
@@ -282,7 +282,7 @@ const Contact = () => {
                   </p>
                   <Button
                     className="bg-green-600 hover:bg-green-700 text-white hover:scale-105 smooth-transition glow-effect"
-                    onClick={() => window.open(`https://wa.me/40720123456?text=${whatsappMessage}`, '_blank')}
+                    onClick={() => window.open(`https://wa.me/40749800325?text=${whatsappMessage}`, '_blank')}
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Scrie pe WhatsApp

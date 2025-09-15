@@ -51,11 +51,11 @@ const Footer = () => {
 
             <div className="space-y-2">
               <a 
-                href="tel:+40720123456" 
+                href="tel:+40749800325" 
                 className="flex items-center space-x-2 text-muted-foreground hover:text-primary smooth-transition"
               >
                 <Phone className="w-4 h-4" />
-                <span>+40 720 123 456</span>
+                <span>+40 749 800 325</span>
               </a>
               <a 
                 href="mailto:contact@djcozo.ro" 
@@ -66,7 +66,7 @@ const Footer = () => {
               </a>
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
-                <span>București, România</span>
+                <span>Iași, România</span>
               </div>
             </div>
           </div>
@@ -120,7 +120,7 @@ const Footer = () => {
               
               <div className="space-y-2">
                 <a
-                  href={`https://wa.me/40720123456?text=${encodeURIComponent("Salut DJ Cozo! Sunt interesat de serviciile tale.")}`}
+                  href={`https://wa.me/40749800325?text=${encodeURIComponent("Salut DJ Cozo! Sunt interesat de serviciile tale.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg smooth-transition text-sm"
