@@ -19,13 +19,25 @@ const Hero = () => {
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* Background Video with Overlay */}
       <div className="absolute inset-0">
-        <img 
-          src={heroImage} 
-          alt="DJ Cozo - Professional DJ Services" 
+        <video 
+          autoPlay
+          muted
+          loop
+          playsInline
           className="w-full h-full object-cover"
-        />
+          poster={heroImage}
+        >
+          <source src="/dj-showcase.mp4" type="video/mp4" />
+          <source src="/dj-showcase.webm" type="video/webm" />
+          {/* Fallback pentru browsere care nu suportă video */}
+          <img 
+            src={heroImage} 
+            alt="DJ Cozo - Professional DJ Services" 
+            className="w-full h-full object-cover"
+          />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/70 to-transparent"></div>
         <div className="absolute inset-0 hero-bg opacity-30"></div>
       </div>
