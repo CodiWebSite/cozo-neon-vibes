@@ -2,4 +2,4 @@ Bine ai venit la proiectul DJ Cozo
 
 Info proiect
 
-URL demo: Lovable Project
+URL demo: [Demo Site](https://djcozo.djfunkyevents.ro/)
