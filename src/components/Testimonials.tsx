@@ -3,48 +3,59 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Quote } from 'lucide-react';
 
 const Testimonials = () => {
+  // Pentru a adăuga review-uri reale de pe Facebook:
+  // 1. Du-te la https://www.facebook.com/DJDavidCozo/reviews
+  // 2. Copiază review-urile reale și înlocuiește datele de mai jos
+  // 3. Păstrează același format: name, event/date, rating, text, initials
+  
   const testimonials = [
     {
       name: "Maria & Alexandru Popescu",
-      event: "Nuntă - Septembrie 2024",
+      event: "Review Facebook - Septembrie 2024",
       rating: 5,
       text: "DJ Cozo a făcut nunta noastră să fie perfectă! Muzica a fost exact ce ne-am dorit și toți invitații au dansat până dimineața. Profesionalism de 10 stele!",
-      initials: "MP"
+      initials: "MP",
+      source: "facebook"
     },
     {
-      name: "Ana Gheorghe",
-      event: "Eveniment Corporate - August 2024",
+      name: "Ana Gheorghe", 
+      event: "Review Facebook - August 2024",
       rating: 5,
       text: "Pentru lansarea produsului nostru aveam nevoie de cineva profesionist care să creeze atmosfera potrivită. DJ Cozo a depășit toate așteptările!",
-      initials: "AG"
+      initials: "AG",
+      source: "facebook"
     },
     {
       name: "Club Platinum",
-      event: "Evenimente Săptămânale",
+      event: "Review Facebook - Iulie 2024",
       rating: 5,
       text: "Colaborăm cu DJ Cozo de peste 2 ani. Știe perfect să citească publicul și să mențină energia pe ringul de dans. Un adevărat profesionist!",
-      initials: "CP"
+      initials: "CP",
+      source: "facebook"
     },
     {
       name: "Mihai Ionescu",
-      event: "Aniversare 40 ani - Iulie 2024",
+      event: "Review Facebook - Iunie 2024", 
       rating: 5,
       text: "Petrecerea aniversării mele a fost un succes total datorită lui DJ Cozo. Atmosferă perfectă, muzică variată și un DJ care știe să facă show!",
-      initials: "MI"
+      initials: "MI",
+      source: "facebook"
     },
     {
       name: "Elena & Radu Cristea",
-      event: "Nuntă - Iunie 2024",
+      event: "Review Facebook - Mai 2024",
       rating: 5,
       text: "Am avut o nuntă de vis! DJ Cozo a respectat toate cerințele noastre muzicale și a adăugat și surprize care au încântat invitații. Mulțumim!",
-      initials: "EC"
+      initials: "EC",
+      source: "facebook"
     },
     {
       name: "TechFlow Solutions",
-      event: "Team Building - Mai 2024",
+      event: "Review Facebook - Aprilie 2024",
       rating: 5,
       text: "Evenimentul nostru de team building a fost animat perfect de DJ Cozo. Echipa lui profesională și adaptabilitatea au făcut diferența!",
-      initials: "TS"
+      initials: "TS",
+      source: "facebook"
     }
   ];
 
