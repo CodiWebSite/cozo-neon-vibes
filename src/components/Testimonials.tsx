@@ -1,63 +1,38 @@
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Star, Quote } from 'lucide-react';
+// src/components/Testimonials.tsx
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Star, Quote, ExternalLink } from "lucide-react";
+
+type FbEmbed = {
+  name: string;
+  event: string;
+  rating: number;
+  excerpt: string;        // 1-2 fraze scurte din review
+  initials: string;
+  fbPermalink: string;    // link direct la recenzie
+  fbEmbedSrc: string;     // URL-ul iframe-ului generat de Facebook (post.php?href=...)
+};
+
+const embeds: FbEmbed[] = [
+  {
+    name: "Maria & Alexandru Popescu",
+    event: "Review Facebook - Septembrie 2024",
+    rating: 5,
+    excerpt:
+      "DJ Cozo a făcut nunta noastră să fie perfectă! Muzica exact cum ne-am dorit, ringul plin.",
+    initials: "MP",
+    fbPermalink:
+      "https://www.facebook.com/permalink.php?story_fbid=pfbid0s5kHcyHLwPzs8Y4CBKibAmJbm84oHx9FyfnrsAV45mEe8A5JfpoU8aAYFvK1b5pul&id=100085050131486",
+    fbEmbedSrc:
+      "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0s5kHcyHLwPzs8Y4CBKibAmJbm84oHx9FyfnrsAV45mEe8A5JfpoU8aAYFvK1b5pul%26id%3D100085050131486&show_text=true&width=500",
+  },
+  // adaugi aici celelalte iframe-uri generate de FB în același format
+];
 
 const Testimonials = () => {
-  // Pentru a adăuga review-uri reale de pe Facebook:
-  // 1. Du-te la https://www.facebook.com/DJDavidCozo/reviews
-  // 2. Copiază review-urile reale și înlocuiește datele de mai jos
-  // 3. Păstrează același format: name, event/date, rating, text, initials
-  
-  const testimonials = [
-    {
-      name: "Maria & Alexandru Popescu",
-      event: "Review Facebook - Septembrie 2024",
-      rating: 5,
-      text: "DJ Cozo a făcut nunta noastră să fie perfectă! Muzica a fost exact ce ne-am dorit și toți invitații au dansat până dimineața. Profesionalism de 10 stele!",
-      initials: "MP",
-      source: "facebook"
-    },
-    {
-      name: "Ana Gheorghe", 
-      event: "Review Facebook - August 2024",
-      rating: 5,
-      text: "Pentru lansarea produsului nostru aveam nevoie de cineva profesionist care să creeze atmosfera potrivită. DJ Cozo a depășit toate așteptările!",
-      initials: "AG",
-      source: "facebook"
-    },
-    {
-      name: "Club Platinum",
-      event: "Review Facebook - Iulie 2024",
-      rating: 5,
-      text: "Colaborăm cu DJ Cozo de peste 2 ani. Știe perfect să citească publicul și să mențină energia pe ringul de dans. Un adevărat profesionist!",
-      initials: "CP",
-      source: "facebook"
-    },
-    {
-      name: "Mihai Ionescu",
-      event: "Review Facebook - Iunie 2024", 
-      rating: 5,
-      text: "Petrecerea aniversării mele a fost un succes total datorită lui DJ Cozo. Atmosferă perfectă, muzică variată și un DJ care știe să facă show!",
-      initials: "MI",
-      source: "facebook"
-    },
-    {
-      name: "Elena & Radu Cristea",
-      event: "Review Facebook - Mai 2024",
-      rating: 5,
-      text: "Am avut o nuntă de vis! DJ Cozo a respectat toate cerințele noastre muzicale și a adăugat și surprize care au încântat invitații. Mulțumim!",
-      initials: "EC",
-      source: "facebook"
-    },
-    {
-      name: "TechFlow Solutions",
-      event: "Review Facebook - Aprilie 2024",
-      rating: 5,
-      text: "Evenimentul nostru de team building a fost animat perfect de DJ Cozo. Echipa lui profesională și adaptabilitatea au făcut diferența!",
-      initials: "TS",
-      source: "facebook"
-    }
-  ];
+  // poți porni cu „ascuns" și la click pe „Vezi dovada pe Facebook" să arăți iframe-ul
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <section id="testimoniale" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
@@ -71,97 +46,90 @@ const Testimonials = () => {
             <span className="gradient-text">Experiențe</span> Autentice
           </h2>
           <p className="text-lg text-muted-foreground">
-            Feedback-ul clienților noștri vorbește despre calitatea și profesionalismul 
-            cu care abordăm fiecare eveniment.
+            Carduri în stilul site-ului + dovadă oficială din Facebook.
           </p>
         </div>
 
-        {/* Testimonials Grid */}
+        {/* Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <Card 
+          {embeds.map((t, index) => (
+            <Card
               key={index}
               className="group bg-card/50 border-border/50 hover:neon-border smooth-transition p-6 relative overflow-hidden"
             >
-              {/* Quote Icon */}
+              {/* Quote */}
               <div className="absolute top-4 right-4 opacity-20">
                 <Quote className="w-8 h-8 text-primary" />
               </div>
 
-              <div className="space-y-4">
-                {/* Stars */}
-                <div className="flex space-x-1">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star 
-                      key={i}
-                      className="w-4 h-4 fill-primary text-primary" 
-                    />
-                  ))}
+              {/* Stars */}
+              <div className="flex space-x-1 mb-3">
+                {Array.from({ length: t.rating }).map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                ))}
+              </div>
+
+              {/* Excerpt */}
+              <p className="text-muted-foreground leading-relaxed text-sm mb-4">
+                "{t.excerpt}"
+              </p>
+
+              {/* Author */}
+              <div className="flex items-center space-x-3 pt-4 border-t border-border/50">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-effect">
+                  <span className="text-sm font-bold text-background">
+                    {t.initials}
+                  </span>
                 </div>
-
-                {/* Testimonial Text */}
-                <p className="text-muted-foreground leading-relaxed text-sm">
-                  "{testimonial.text}"
-                </p>
-
-                {/* Author Info */}
-                <div className="flex items-center space-x-3 pt-4 border-t border-border/50">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-effect">
-                    <span className="text-sm font-bold text-background">
-                      {testimonial.initials}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground text-sm">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {testimonial.event}
-                    </p>
-                  </div>
+                <div>
+                  <p className="font-semibold text-foreground text-sm">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t.event}</p>
                 </div>
               </div>
 
-              {/* Hover Effect */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 smooth-transition pointer-events-none"></div>
+              {/* Actions */}
+              <div className="mt-4 flex items-center gap-8">
+                <button
+                  className="text-sm text-primary hover:underline inline-flex items-center gap-2"
+                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                >
+                  {openIndex === index ? "Ascunde dovada" : "Vezi dovada (Facebook)"} <ExternalLink className="w-4 h-4" />
+                </button>
+                <a
+                  href={t.fbPermalink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm text-muted-foreground hover:underline"
+                >
+                  Deschide pe Facebook
+                </a>
+              </div>
+
+              {/* Embed FB în același card, cu „ramă" ta */}
+              {openIndex === index && (
+                <div className="mt-4 rounded-xl overflow-hidden border border-border/60 bg-background/40">
+                  <div className="relative" style={{ aspectRatio: "16/9" }}>
+                    <iframe
+                      src={t.fbEmbedSrc}
+                      title={`fb-embed-${index}`}
+                      loading="lazy"
+                      scrolling="no"
+                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                      style={{
+                        border: "0",
+                        width: "100%",
+                        height: "100%",
+                        overflow: "hidden",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 smooth-transition pointer-events-none" />
             </Card>
           ))}
-        </div>
-
-        {/* Stats */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="text-center">
-            <div className="text-3xl font-heading font-bold gradient-text mb-2">
-              98%
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Clienți Mulțumiți
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-heading font-bold gradient-text mb-2">
-              500+
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Evenimente Reușite
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-heading font-bold gradient-text mb-2">
-              5⭐
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Rating Mediu
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-heading font-bold gradient-text mb-2">
-              100%
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Recomandări
-            </p>
-          </div>
         </div>
       </div>
     </section>
