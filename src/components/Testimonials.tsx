@@ -1,135 +1,115 @@
-// src/components/Testimonials.tsx
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Star, Quote, ExternalLink } from "lucide-react";
+// dacă vrei badge sus, decomentează următoarea linie
+// import { Badge } from "@/components/ui/badge";
 
-type FbEmbed = {
-  name: string;
-  event: string;
-  rating: number;
-  excerpt: string;        // 1-2 fraze scurte din review
-  initials: string;
-  fbPermalink: string;    // link direct la recenzie
-  fbEmbedSrc: string;     // URL-ul iframe-ului generat de Facebook (post.php?href=...)
-};
-
-const embeds: FbEmbed[] = [
+const fbReviews = [
   {
-    name: "Maria & Alexandru Popescu",
-    event: "Review Facebook - Septembrie 2024",
-    rating: 5,
-    excerpt:
-      "DJ Cozo a făcut nunta noastră să fie perfectă! Muzica exact cum ne-am dorit, ringul plin.",
-    initials: "MP",
-    fbPermalink:
-      "https://www.facebook.com/permalink.php?story_fbid=pfbid0s5kHcyHLwPzs8Y4CBKibAmJbm84oHx9FyfnrsAV45mEe8A5JfpoU8aAYFvK1b5pul&id=100085050131486",
-    fbEmbedSrc:
-      "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0s5kHcyHLwPzs8Y4CBKibAmJbm84oHx9FyfnrsAV45mEe8A5JfpoU8aAYFvK1b5pul%26id%3D100085050131486&show_text=true&width=500",
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0yQ9WNA4KTXeNy7CjPjtXb4p5WPpme37rejEuoXDmWvVAdJVECaeCqh4gAdTpdWwKl%26id%3D100006627706575&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/permalink.php?story_fbid=pfbid0yQ9WNA4KTXeNy7CjPjtXb4p5WPpme37rejEuoXDmWvVAdJVECaeCqh4gAdTpdWwKl&id=100006627706575",
   },
-  // adaugi aici celelalte iframe-uri generate de FB în același format
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fatofanei.andreea%2Fposts%2Fpfbid0aWv998mGyymkfdEABuBxe3xZYPvYM5YVrbG1EEuV7fW5RLNdSuiJxMWjCh1sVcJul&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/atofanei.andreea/posts/pfbid0aWv998mGyymkfdEABuBxe3xZYPvYM5YVrbG1EEuV7fW5RLNdSuiJxMWjCh1sVcJul",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fsorina.calinescu%2Fposts%2Fpfbid09nYwPJ5Kn6Kbbpxa3FQdP9fQib6QDAwmDTXWcJSTF3NN1jzrWx7eQQxmtcviYXG5l&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/sorina.calinescu/posts/pfbid09nYwPJ5Kn6Kbbpxa3FQdP9fQib6QDAwmDTXWcJSTF3NN1jzrWx7eQQxmtcviYXG5l",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FLucian.wfy%2Fposts%2Fpfbid02W9f5Wgzepe2GWWHZdyZdL4aM4vW2VqQNdf1wDhAiwmvgMGc7jBBpuRXsTsUDk6h3l&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/Lucian.wfy/posts/pfbid02W9f5Wgzepe2GWWHZdyZdL4aM4vW2VqQNdf1wDhAiwmvgMGc7jBBpuRXsTsUDk6h3l",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0NSzLkEfh4ibXcRx2xdwNjL6FvzV3ja14fARc1gdrpGNxJ49ErhQGwNYrWream4rzl%26id%3D100078346758564&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/permalink.php?story_fbid=pfbid0NSzLkEfh4ibXcRx2xdwNjL6FvzV3ja14fARc1gdrpGNxJ49ErhQGwNYrWream4rzl&id=100078346758564",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0xM2sAVYrK4g4pDV8LC7tNoucVfrP2KdZijdVjQMBHh4orKn12xV67rKYmroUwS5l%26id%3D100073311492127&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/permalink.php?story_fbid=pfbid0xM2sAVYrK4g4pDV8LC7tNoucVfrP2KdZijdVjQMBHh4orKn12xV67rKYmroUwS5l&id=100073311492127",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fdenisa.rascanu.5%2Fposts%2Fpfbid0pjzvEHnapHeUKH6cUA7s8SBsXn1kaNV7wdsanthLSoG5J8hwM2Xn1oNxUTbWFtAAl&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/denisa.rascanu.5/posts/pfbid0pjzvEHnapHeUKH6cUA7s8SBsXn1kaNV7wdsanthLSoG5J8hwM2Xn1oNxUTbWFtAAl",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid02Aww577r79ctUXsfRst3h9yjcaGBmYswbCwmu6Uc2YXnvXjgAp6yEzhqqQgpHcVv9l%26id%3D100008501984205&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/permalink.php?story_fbid=pfbid02Aww577r79ctUXsfRst3h9yjcaGBmYswbCwmu6Uc2YXnvXjgAp6yEzhqqQgpHcVv9l&id=100008501984205",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0Xj4spnFH99wdurGyPVjqoTHKi1ZtTcsngtvQdM9jwakjA2BtZkUzoTHGNfUb1w1cl%26id%3D61560298405537&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/permalink.php?story_fbid=pfbid0Xj4spnFH99wdurGyPVjqoTHKi1ZtTcsngtvQdM9jwakjA2BtZkUzoTHGNfUb1w1cl&id=61560298405537",
+  },
+  {
+    src: "https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Falex.p.a19%2Fposts%2Fpfbid02qkyKUWSihqtzMXADQVMwFuTwy6YDcAfXXi4az8EbUK9XC5i1Pw58k26JE2RxGf4bl&show_text=true&width=500",
+    permalink:
+      "https://www.facebook.com/alex.p.a19/posts/pfbid02qkyKUWSihqtzMXADQVMwFuTwy6YDcAfXXi4az8EbUK9XC5i1Pw58k26JE2RxGf4bl",
+  },
 ];
 
 const Testimonials = () => {
-  // poți porni cu „ascuns" și la click pe „Vezi dovada pe Facebook" să arăți iframe-ul
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
   return (
     <section id="testimoniale" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
       <div className="container-custom">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge variant="outline" className="neon-border text-primary mb-4">
-            Ce Spun Clienții
-          </Badge>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6">
-            <span className="gradient-text">Experiențe</span> Autentice
+        {/* Header scurt, fără explicații */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          {/* <Badge variant="outline" className="neon-border text-primary mb-3">Ce spun clienții</Badge> */}
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold">
+            <span className="gradient-text">Recenzii</span> de pe Facebook
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Carduri în stilul site-ului + dovadă oficială din Facebook.
-          </p>
         </div>
 
-        {/* Grid */}
+        {/* Grid cu iframes, încadrate în cardurile tale */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {embeds.map((t, index) => (
+          {fbReviews.map((item, i) => (
             <Card
-              key={index}
-              className="group bg-card/50 border-border/50 hover:neon-border smooth-transition p-6 relative overflow-hidden"
+              key={i}
+              className="bg-card/50 border-border/50 hover:neon-border smooth-transition p-0 overflow-hidden"
             >
-              {/* Quote */}
-              <div className="absolute top-4 right-4 opacity-20">
-                <Quote className="w-8 h-8 text-primary" />
+              <div className="relative aspect-[16/9] w-full">
+                <iframe
+                  src={item.src}
+                  title={`fb-review-${i}`}
+                  loading="lazy"
+                  scrolling="no"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                  style={{ border: 0, width: "100%", height: "100%", overflow: "hidden" }}
+                />
               </div>
 
-              {/* Stars */}
-              <div className="flex space-x-1 mb-3">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                ))}
-              </div>
-
-              {/* Excerpt */}
-              <p className="text-muted-foreground leading-relaxed text-sm mb-4">
-                "{t.excerpt}"
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center space-x-3 pt-4 border-t border-border/50">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-effect">
-                  <span className="text-sm font-bold text-background">
-                    {t.initials}
-                  </span>
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground text-sm">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.event}</p>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="mt-4 flex items-center gap-8">
-                <button
-                  className="text-sm text-primary hover:underline inline-flex items-center gap-2"
-                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                >
-                  {openIndex === index ? "Ascunde dovada" : "Vezi dovada (Facebook)"} <ExternalLink className="w-4 h-4" />
-                </button>
+              {/* link discret către postarea FB (opțional) */}
+              <div className="px-4 py-3 border-t border-border/60 flex justify-end">
                 <a
-                  href={t.fbPermalink}
+                  href={item.permalink}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm text-muted-foreground hover:underline"
+                  className="text-xs text-muted-foreground hover:text-primary underline underline-offset-4"
                 >
-                  Deschide pe Facebook
+                  Deschide postarea
                 </a>
               </div>
-
-              {/* Embed FB în același card, cu „ramă" ta */}
-              {openIndex === index && (
-                <div className="mt-4 rounded-xl overflow-hidden border border-border/60 bg-background/40">
-                  <div className="relative" style={{ aspectRatio: "16/9" }}>
-                    <iframe
-                      src={t.fbEmbedSrc}
-                      title={`fb-embed-${index}`}
-                      loading="lazy"
-                      scrolling="no"
-                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                      style={{
-                        border: "0",
-                        width: "100%",
-                        height: "100%",
-                        overflow: "hidden",
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 smooth-transition pointer-events-none" />
             </Card>
           ))}
+        </div>
+
+        {/* CTA „Vezi mai multe" */}
+        <div className="text-center mt-12">
+          <a
+            href="https://www.facebook.com/DJDavidCozo/reviews"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center px-5 py-3 rounded-lg border border-border/60 hover:border-primary smooth-transition"
+          >
+            Vezi mai multe review-uri
+          </a>
         </div>
       </div>
     </section>
