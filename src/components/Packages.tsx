@@ -74,14 +74,14 @@ const Packages = () => {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge variant="outline" className="neon-border text-primary mb-4">
-            Pachete & Prețuri
+            Pachete Disponibile
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6">
             Alege <span className="gradient-text">Pachetul</span> Perfect
           </h2>
           <p className="text-lg text-muted-foreground">
-            Pachete complete adaptate pentru orice tip de eveniment și buget. 
-            Toate prețurile includ echipament, transport și setup.
+            Pachete complete adaptate pentru orice tip de eveniment. 
+            Servicii profesionale cu echipament, transport și setup inclus.
           </p>
         </div>
 
@@ -122,13 +122,7 @@ const Packages = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <div className="flex items-baseline justify-center space-x-1">
-                      <span className="text-3xl font-heading font-bold gradient-text">
-                        {pkg.price}
-                      </span>
-                      <span className="text-muted-foreground">€</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-lg font-semibold gradient-text">
                       {pkg.duration} eveniment
                     </p>
                   </div>
