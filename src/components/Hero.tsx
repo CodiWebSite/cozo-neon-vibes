@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Play, Music, Headphones } from 'lucide-react';
-import heroImage from '@/assets/hero-dj.jpg';
+import heroImage from '@/assets/hero-dj-new.jpg';
 
 const Hero = () => {
   const scrollToContact = () => {
