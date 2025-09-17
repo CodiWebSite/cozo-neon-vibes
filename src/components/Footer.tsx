@@ -147,6 +147,8 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2 text-muted-foreground text-sm">
               <span>© {currentYear} DJ Cozo. Toate drepturile rezervate.</span>
+              <span className="text-border">•</span>
+              <a href="/admin/auth" className="hover:text-primary smooth-transition text-xs opacity-50">Admin</a>
             </div>
             
             <div className="flex items-center space-x-2 text-muted-foreground text-sm">
