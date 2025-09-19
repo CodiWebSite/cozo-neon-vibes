@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Play, Music, Headphones } from 'lucide-react';
-import heroImage from '@/assets/hero-dj-new.jpg';
+import heroImage from "@/assets/hero-dj-new.jpg";
+import { useContent } from "@/hooks/useContent";
 
 const Hero = () => {
+  const { getContent } = useContent();
   const scrollToContact = () => {
     const element = document.getElementById('contact');
     if (element) {

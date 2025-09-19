@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Plus, Trash2, Edit, Upload, LogOut } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ContentManager from '@/components/admin/ContentManager';
 
 interface GalleryImage {
   id: string;
@@ -203,7 +205,7 @@ const AdminDashboard = () => {
               Admin Dashboard
             </Badge>
             <h1 className="text-3xl font-heading font-bold">
-              <span className="gradient-text">Gestionare</span> Galerie
+              <span className="gradient-text">Panou</span> Admin
             </h1>
           </div>
           <div className="flex gap-4">
@@ -217,145 +219,158 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Add Image Button */}
-        <div className="mb-6">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={resetForm}>
-                <Plus className="h-4 w-4 mr-2" />
-                Adaugă Imagine
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingImage ? 'Editează Imaginea' : 'Adaugă Imagine Nouă'}
-                </DialogTitle>
-                <DialogDescription>
-                  Completează detaliile pentru imagine.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Titlu</Label>
-                  <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="altText">Text alternativ</Label>
-                  <Input
-                    id="altText"
-                    value={altText}
-                    onChange={(e) => setAltText(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="category">Categorie</Label>
-                  <Select value={category} onValueChange={setCategory} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Alege categoria" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Weddings">Weddings</SelectItem>
-                      <SelectItem value="Corporate">Corporate</SelectItem>
-                      <SelectItem value="Club Events">Club Events</SelectItem>
-                      <SelectItem value="Private">Private</SelectItem>
-                      <SelectItem value="Studio">Studio</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="displayOrder">Ordine afișare</Label>
-                  <Input
-                    id="displayOrder"
-                    type="number"
-                    value={displayOrder}
-                    onChange={(e) => setDisplayOrder(parseInt(e.target.value))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="file">
-                    {editingImage ? 'Înlocuiește imaginea (opțional)' : 'Imagine'}
-                  </Label>
-                  <Input
-                    id="file"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    required={!editingImage}
-                  />
-                </div>
-                <Button type="submit" disabled={uploading} className="w-full">
-                  {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {editingImage ? 'Actualizează' : 'Adaugă'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Images Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {images.map((image) => (
-            <Card key={image.id} className="bg-card/30 border-border/50">
-              <CardHeader className="pb-2">
-                <div className="aspect-square overflow-hidden rounded-lg">
-                  <img
-                    src={image.image_url}
-                    alt={image.alt_text}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-sm">{image.title}</h3>
-                    <Badge variant="outline" className="text-xs">
-                      {image.category}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {image.alt_text}
-                  </p>
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xs text-muted-foreground">
-                      Ordine: {image.display_order}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEdit(image)}
-                      >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(image.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+        <Tabs defaultValue="gallery" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="gallery">Galerie</TabsTrigger>
+            <TabsTrigger value="content">Conținut Site</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="gallery" className="space-y-6">
+            {/* Add Image Button */}
+            <div>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={resetForm}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Adaugă Imagine
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingImage ? 'Editează Imaginea' : 'Adaugă Imagine Nouă'}
+                    </DialogTitle>
+                    <DialogDescription>
+                      Completează detaliile pentru imagine.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="title">Titlu</Label>
+                      <Input
+                        id="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                      />
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    <div>
+                      <Label htmlFor="altText">Text alternativ</Label>
+                      <Input
+                        id="altText"
+                        value={altText}
+                        onChange={(e) => setAltText(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="category">Categorie</Label>
+                      <Select value={category} onValueChange={setCategory} required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Alege categoria" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Weddings">Weddings</SelectItem>
+                          <SelectItem value="Corporate">Corporate</SelectItem>
+                          <SelectItem value="Club Events">Club Events</SelectItem>
+                          <SelectItem value="Private">Private</SelectItem>
+                          <SelectItem value="Studio">Studio</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="displayOrder">Ordine afișare</Label>
+                      <Input
+                        id="displayOrder"
+                        type="number"
+                        value={displayOrder}
+                        onChange={(e) => setDisplayOrder(parseInt(e.target.value))}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="file">
+                        {editingImage ? 'Înlocuiește imaginea (opțional)' : 'Imagine'}
+                      </Label>
+                      <Input
+                        id="file"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        required={!editingImage}
+                      />
+                    </div>
+                    <Button type="submit" disabled={uploading} className="w-full">
+                      {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {editingImage ? 'Actualizează' : 'Adaugă'}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
 
-        {images.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Nu există imagini în galerie.</p>
-          </div>
-        )}
+            {/* Images Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {images.map((image) => (
+                <Card key={image.id} className="bg-card/30 border-border/50">
+                  <CardHeader className="pb-2">
+                    <div className="aspect-square overflow-hidden rounded-lg">
+                      <img
+                        src={image.image_url}
+                        alt={image.alt_text}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-semibold text-sm">{image.title}</h3>
+                        <Badge variant="outline" className="text-xs">
+                          {image.category}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {image.alt_text}
+                      </p>
+                      <div className="flex justify-between items-center mt-4">
+                        <span className="text-xs text-muted-foreground">
+                          Ordine: {image.display_order}
+                        </span>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(image)}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(image.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {images.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Nu există imagini în galerie.</p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="content">
+            <ContentManager />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

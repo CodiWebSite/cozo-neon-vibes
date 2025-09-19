@@ -2,12 +2,14 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, Building, PartyPopper, Users } from 'lucide-react';
+import { useContent } from "@/hooks/useContent";
 import weddingImage from '@/assets/wedding-dj.jpg';
 import corporateImage from '@/assets/corporate-event.jpg';
 import clubImage from '@/assets/club-night.jpg';
 import privateImage from '@/assets/private-party.jpg';
 
 const Services = () => {
+  const { getContent } = useContent();
   const services = [
     {
       icon: Heart,

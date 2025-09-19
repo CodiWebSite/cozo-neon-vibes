@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useContent } from "@/hooks/useContent";
 import { 
   Phone, 
   Mail, 
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 
 const Contact = () => {
+  const { getContent } = useContent();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
