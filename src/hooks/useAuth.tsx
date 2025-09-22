@@ -23,29 +23,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        // Only synchronous state updates here
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
         
-        // Check admin status when user logs in
+        // Defer admin check with setTimeout to avoid deadlocks
         if (session?.user) {
-          setTimeout(async () => {
-            try {
-              const { data } = await supabase
-                .from('admin_users')
-                .select('id')
-                .eq('user_id', session.user.id)
-                .single();
-              setIsAdmin(!!data);
-            } catch (error) {
-              setIsAdmin(false);
-            }
+          setTimeout(() => {
+            checkAdminStatus(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
         }
-        
-        setLoading(false);
       }
     );
 
@@ -54,6 +45,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Check admin status for existing session
+      if (session?.user) {
+        setTimeout(() => {
+          checkAdminStatus(session.user.id);
+        }, 0);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -78,6 +76,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
     return { error };
+  };
+
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('admin_users')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+      setIsAdmin(!!data);
+    } catch (error) {
+      setIsAdmin(false);
+    }
   };
 
   const signOut = async () => {
