@@ -9,8 +9,10 @@ import clubImage from '@/assets/club-night.jpg';
 import privateImage from '@/assets/private-party.jpg';
 
 const Services = () => {
-  const { getContent } = useContent();
-  const services = [
+  const { getContent, services: contextServices } = useContent();
+  
+  // Folosim serviciile din context dacă există, altfel folosim datele statice
+  const defaultServices = [
     {
       icon: Heart,
       title: "Nunți",
@@ -41,9 +43,12 @@ const Services = () => {
       description: "Petreceri private, aniversări și celebrări intime cu atmosfera dorită de tine.",
       image: privateImage,
       features: ["Playlist personalizat", "Flexibilitate maximă", "Echipament compact", "Preț accesibil"],
-      gradient: "from-emerald-500 to-teal-500",
+      gradient: "from-amber-500 to-orange-500",
     },
   ];
+  
+  // Folosim serviciile din context dacă există, altfel folosim datele statice
+  const services = contextServices && contextServices.length > 0 ? contextServices : defaultServices;
 
   const scrollToContact = () => {
     const element = document.getElementById('contact');

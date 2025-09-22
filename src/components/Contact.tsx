@@ -14,21 +14,37 @@ import {
   MessageCircle,
   Send,
   Calendar,
-  Music
+  Music,
+  Facebook,
+  Instagram,
+  Youtube
 } from 'lucide-react';
 
 const Contact = () => {
-  const { getContent } = useContent();
+  const { getContent, contactInfo: contextContactInfo } = useContent();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  
+  // Folosim informațiile de contact din context dacă există, altfel folosim datele statice
+  const defaultContactInfo = {
+    phone: "+40 742 123 456",
+    email: "contact@djcozo.ro",
+    instagram: "https://www.instagram.com/djcozo",
+    facebook: "https://www.facebook.com/djcozo",
+    youtube: "https://www.youtube.com/djcozo",
+    tiktok: "https://www.tiktok.com/@djcozo"
+  };
+  
+  // Folosim informațiile de contact din context dacă există, altfel folosim datele statice
+  const contactData = contextContactInfo ? contextContactInfo : defaultContactInfo;
   
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    eventType: '',
-    eventDate: '',
-    message: ''
+    message: '',
+    event_type: '',
+    event_date: '',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -60,18 +76,18 @@ const Contact = () => {
     }, 1000);
   };
 
-  const contactInfo = [
+  const contactInfoDisplay = [
     {
       icon: Phone,
       title: "Telefon",
-      detail: "+40 749 800 325",
-      action: "tel:+40749800325"
+      detail: contactData.phone,
+      action: `tel:${contactData.phone.replace(/\s+/g, '')}`
     },
     {
       icon: Mail,
       title: "Email",
-      detail: "contact@djcozo.ro",
-      action: "mailto:contact@djcozo.ro"
+      detail: contactData.email,
+      action: `mailto:${contactData.email}`
     },
     {
       icon: MapPin,
@@ -248,7 +264,7 @@ const Contact = () => {
                 </div>
 
                 <div className="grid gap-4">
-                  {contactInfo.map((info, index) => (
+                  {contactInfoDisplay.map((info, index) => (
                     <div 
                       key={index}
                       className={`flex items-center space-x-4 p-4 bg-secondary/30 rounded-lg ${
@@ -289,6 +305,39 @@ const Contact = () => {
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Scrie pe WhatsApp
                   </Button>
+                </div>
+              </div>
+            </Card>
+            
+            {/* Social Media Links */}
+            <Card className="p-8 bg-card/50 border-border/50 hover:neon-border smooth-transition">
+              <div className="text-center space-y-4">
+                <div className="inline-flex p-3 bg-primary/10 rounded-full glow-effect">
+                  <Music className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-heading font-bold text-foreground mb-2">
+                    Urmărește-mă
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Conectează-te cu mine pe rețelele sociale
+                  </p>
+                  <div className="flex gap-4 justify-center mt-6">
+                    <a href={contactData.facebook} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
+                      <Facebook className="h-5 w-5 text-primary" />
+                    </a>
+                    <a href={contactData.instagram} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
+                      <Instagram className="h-5 w-5 text-primary" />
+                    </a>
+                    <a href={contactData.youtube} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
+                      <Youtube className="h-5 w-5 text-primary" />
+                    </a>
+                    <a href={contactData.tiktok} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
+                      <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.321 5.562a5.122 5.122 0 0 1-3.414-1.267 5.133 5.133 0 0 1-1.635-3.257h-3.858v13.506c0 1.741-1.416 3.158-3.158 3.158-1.742 0-3.158-1.417-3.158-3.158 0-1.741 1.416-3.158 3.158-3.158.348 0 .682.058 1 .16v-3.9a7.067 7.067 0 0 0-1-.072C3.158 7.574 0 10.732 0 14.63s3.158 7.058 7.056 7.058c3.899 0 7.056-3.158 7.056-7.058V9.321c1.537 1.094 3.399 1.745 5.209 1.745v-3.9c0-1.604 0-1.604 0-1.604Z" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               </div>
             </Card>

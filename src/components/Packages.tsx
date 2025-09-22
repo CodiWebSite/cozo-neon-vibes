@@ -2,9 +2,13 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, Star, Zap, Crown } from 'lucide-react';
+import { useContent } from "@/hooks/useContent";
 
 const Packages = () => {
-  const packages = [
+  const { getContent, packages: contextPackages } = useContent();
+  
+  // Folosim pachetele din context dacă există, altfel folosim datele statice
+  const defaultPackages = [
     {
       name: "Starter",
       icon: Zap,
@@ -60,6 +64,9 @@ const Packages = () => {
       gradient: "from-amber-500 to-orange-500",
     },
   ];
+  
+  // Folosim pachetele din context dacă există, altfel folosim datele statice
+  const packages = contextPackages && contextPackages.length > 0 ? contextPackages : defaultPackages;
 
   const scrollToContact = () => {
     const element = document.getElementById('contact');

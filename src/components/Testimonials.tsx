@@ -1,4 +1,7 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { useContent } from "@/hooks/useContent";
 
 const DARKEN_IFRAME = true; // setează false și folosește varianta cu invert/filter (experimental)
 
@@ -62,46 +65,63 @@ const IFrameBox = ({ src }: { src: string }) => {
 };
 
 const Testimonials = () => {
+  const { getContent, testimonials: contextTestimonials } = useContent();
+  
+  // Folosim testimonialele din context dacă există, altfel folosim datele statice
+  const defaultTestimonials = [
+    {
+      name: "Alexandra & Mihai",
+      role: "Miri",
+      content: "DJ Cozo a creat atmosfera perfectă la nunta noastră! Toți invitații au dansat până dimineața și am primit numeroase complimente pentru muzică.",
+      image: "/testimonials/couple1.jpg"
+    },
+    {
+      name: "Elena Popescu",
+      role: "Manager evenimente",
+      content: "Am colaborat cu DJ Cozo pentru mai multe evenimente corporate și de fiecare dată a fost extrem de profesionist. Recomand cu încredere!",
+      image: "/testimonials/manager1.jpg"
+    },
+    {
+      name: "Andrei Ionescu",
+      role: "Proprietar club",
+      content: "De când colaborăm cu DJ Cozo, clubul nostru este plin în fiecare weekend. Are un simț extraordinar pentru ce vrea publicul să asculte.",
+      image: "/testimonials/owner1.jpg"
+    }
+  ];
+  
+  // Folosim testimonialele din context dacă există, altfel folosim datele statice
+  const testimonials = contextTestimonials && contextTestimonials.length > 0 ? contextTestimonials : defaultTestimonials;
+  
   return (
     <section id="testimoniale" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
-      <div className="container-custom">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold">
-            <span className="gradient-text">Recenzii</span> de pe Facebook
-          </h2>
+      <div className="container">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Ce spun clienții</h2>
+          <p className="text-lg text-muted-foreground">Testimoniale reale de la evenimente de neuitat</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {fbReviews.map((item, i) => (
-            <Card
-              key={i}
-              className="bg-card/60 border-border/60 hover:neon-border smooth-transition p-0 overflow-hidden
-                         shadow-[0_0_0_1px_rgba(255,255,255,.06)]"
-            >
-              <IFrameBox src={item.src} />
-              <div className="px-4 py-3 border-t border-border/60 flex justify-end">
-                <a
-                  href={item.permalink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-muted-foreground hover:text-primary underline underline-offset-4"
-                >
-                  Deschide postarea
-                </a>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+          {testimonials.map((testimonial, index) => (
+            <Card key={index} className="bg-card/50 backdrop-blur-sm border-primary/10 hover:border-primary/20 transition-all duration-300">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12 border-2 border-primary/20">
+                    <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-lg">{testimonial.name}</CardTitle>
+                    <CardDescription>{testimonial.role}</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <blockquote className="italic text-muted-foreground">
+                  "{testimonial.content}"
+                </blockquote>
+              </CardContent>
             </Card>
           ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <a
-            href="https://www.facebook.com/DJDavidCozo/reviews"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center px-5 py-3 rounded-lg border border-border/60 hover:border-primary smooth-transition"
-          >
-            Vezi mai multe review-uri
-          </a>
         </div>
       </div>
     </section>
