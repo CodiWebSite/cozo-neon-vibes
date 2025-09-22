@@ -42,7 +42,7 @@ const Header = () => {
       }`}
     >
       <nav className="container-custom">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-20 lg:h-24">
           {/* Logo */}
           <div 
             className="flex items-center cursor-pointer"
@@ -51,7 +51,7 @@ const Header = () => {
             <img 
               src={logoImg} 
               alt="DJ Cozo Logo" 
-              className="h-16 w-auto object-contain"
+              className="h-20 w-auto object-contain"
             />
           </div>
 
