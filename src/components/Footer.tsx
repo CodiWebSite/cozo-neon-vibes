@@ -40,7 +40,7 @@ const Footer = () => {
               <img 
                 src={logoImg} 
                 alt="DJ Cozo Logo" 
-                className="h-12 w-auto object-contain"
+                className="h-16 w-auto object-contain"
               />
             </div>
             
