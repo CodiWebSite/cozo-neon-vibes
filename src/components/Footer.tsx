@@ -1,4 +1,5 @@
-import { Music, Heart, Mail, Phone, MapPin } from 'lucide-react';
+import { Heart, Mail, Phone, MapPin } from 'lucide-react';
+import logoImg from '@/assets/dj-cozo-logo.png';
 
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
@@ -35,13 +36,12 @@ const Footer = () => {
         <div className="py-16 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Column */}
           <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <div className="p-2 bg-gradient-to-br from-primary to-accent rounded-lg glow-effect">
-                <Music className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-heading font-bold gradient-text">
-                DJ COZO
-              </span>
+            <div className="flex items-center">
+              <img 
+                src={logoImg} 
+                alt="DJ Cozo Logo" 
+                className="h-12 w-auto object-contain"
+              />
             </div>
             
             <p className="text-muted-foreground leading-relaxed">
