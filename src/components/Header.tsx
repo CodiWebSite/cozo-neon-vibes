@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Music } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logoImg from '@/assets/dj-cozo-logo.png';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,15 +45,14 @@ const Header = () => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <div 
-            className="flex items-center space-x-2 cursor-pointer"
+            className="flex items-center cursor-pointer"
             onClick={() => scrollToSection('hero')}
           >
-            <div className="relative">
-              <Music className="w-8 h-8 text-primary glow-effect" />
-            </div>
-            <span className="text-xl font-heading font-bold gradient-text">
-              DJ COZO
-            </span>
+            <img 
+              src={logoImg} 
+              alt="DJ Cozo Logo" 
+              className="h-10 w-auto object-contain"
+            />
           </div>
 
           {/* Desktop Navigation */}
