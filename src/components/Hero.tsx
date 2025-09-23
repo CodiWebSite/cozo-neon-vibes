@@ -4,7 +4,6 @@ import heroImage from "@/assets/hero-dj-new.jpg";
 import { useContent } from "@/hooks/useContent";
 
 const Hero = () => {
-  const { getContent } = useContent();
   const scrollToContact = () => {
     const element = document.getElementById('contact');
     if (element) {

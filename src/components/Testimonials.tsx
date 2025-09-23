@@ -65,7 +65,7 @@ const IFrameBox = ({ src }: { src: string }) => {
 };
 
 const Testimonials = () => {
-  const { getContent, testimonials: contextTestimonials } = useContent();
+  const { testimonials: contextTestimonials } = useContent();
   
   // Folosim testimonialele din context dacă există, altfel folosim datele statice
   const defaultTestimonials = [

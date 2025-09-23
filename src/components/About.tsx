@@ -5,7 +5,6 @@ import djPortrait from "@/assets/dj-portrait.jpg";
 import { useContent } from "@/hooks/useContent";
 
 const About = () => {
-  const { getContent } = useContent();
   const stats = [
     {
       icon: Music,

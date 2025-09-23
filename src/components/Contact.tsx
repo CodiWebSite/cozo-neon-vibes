@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 const Contact = () => {
-  const { getContent, contactInfo: contextContactInfo } = useContent();
+  const { contactInfo: contextContactInfo } = useContent();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
@@ -69,8 +69,8 @@ const Contact = () => {
         name: '',
         email: '',
         phone: '',
-        eventType: '',
-        eventDate: '',
+        event_type: '',
+        event_date: '',
         message: ''
       });
     }, 1000);
@@ -185,8 +185,8 @@ const Contact = () => {
                       Tip Eveniment *
                     </label>
                     <select
-                      name="eventType"
-                      value={formData.eventType}
+                      name="event_type"
+                      value={formData.event_type}
                       onChange={handleInputChange}
                       required
                       className="w-full px-3 py-2 bg-background/50 border border-border rounded-md text-foreground focus:neon-border smooth-transition"
@@ -206,9 +206,9 @@ const Contact = () => {
                     Data Evenimentului
                   </label>
                   <Input
-                    name="eventDate"
+                    name="event_date"
                     type="date"
-                    value={formData.eventDate}
+                    value={formData.event_date}
                     onChange={handleInputChange}
                     className="bg-background/50 border-border focus:neon-border"
                   />

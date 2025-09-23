@@ -1,17 +1,18 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, Star, Zap, Crown } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useContent } from "@/hooks/useContent";
+import { getIconComponent } from '@/lib/iconUtils';
 
 const Packages = () => {
-  const { getContent, packages: contextPackages } = useContent();
+  const { packages: contextPackages } = useContent();
   
   // Folosim pachetele din context dacă există, altfel folosim datele statice
   const defaultPackages = [
     {
       name: "Starter",
-      icon: Zap,
+      icon: "Zap",
       price: "400",
       duration: "4 ore",
       description: "Perfect pentru petreceri mici și evenimente private",
@@ -27,7 +28,7 @@ const Packages = () => {
     },
     {
       name: "Professional",
-      icon: Star,
+      icon: "Star",
       price: "650",
       duration: "6 ore",
       description: "Cel mai popular pachet pentru nunți și evenimente corporate",
@@ -45,7 +46,7 @@ const Packages = () => {
     },
     {
       name: "Premium",
-      icon: Crown,
+      icon: "Crown",
       price: "900",
       duration: "8 ore",
       description: "Experiență completă cu toate serviciile incluse",
@@ -94,17 +95,19 @@ const Packages = () => {
 
         {/* Packages Grid */}
         <div className="grid md:grid-cols-3 gap-8">
-          {packages.map((pkg, index) => (
+        {packages.map((pkg, index) => {
+          const IconComponent = getIconComponent(typeof pkg.icon === 'string' ? pkg.icon : 'Star');
+          return (
             <Card 
               key={index}
               className={`relative overflow-hidden group ${
-                pkg.popular 
+                pkg.popular || pkg.isPopular
                   ? 'ring-2 ring-primary/50 bg-card/80 border-primary/30 scale-105' 
                   : 'bg-card/50 border-border/50'
               } hover:neon-border smooth-transition`}
             >
               {/* Popular Badge */}
-              {pkg.popular && (
+              {(pkg.popular || pkg.isPopular) && (
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                   <Badge className={`bg-gradient-to-r ${pkg.gradient} text-white glow-effect px-4 py-1`}>
                     Cel Mai Popular
@@ -116,7 +119,7 @@ const Packages = () => {
                 {/* Header */}
                 <div className="text-center space-y-4">
                   <div className={`inline-flex p-3 rounded-full bg-gradient-to-br ${pkg.gradient} glow-effect`}>
-                    <pkg.icon className="w-6 h-6 text-white" />
+                    <IconComponent className="w-6 h-6 text-white" />
                   </div>
                   
                   <div>
@@ -155,17 +158,18 @@ const Packages = () => {
                 {/* CTA Button */}
                 <Button 
                   className={`w-full ${
-                    pkg.popular 
+                    pkg.popular || pkg.isPopular
                       ? `bg-gradient-to-r ${pkg.gradient} hover:scale-105 glow-effect text-white` 
                       : 'neon-border hover:glow-effect hover:bg-secondary/50'
                   } smooth-transition`}
                   onClick={scrollToContact}
                 >
-                  {pkg.popular ? 'Rezervă Acum' : 'Selectează Pachetul'}
+                  {pkg.popular || pkg.isPopular ? 'Rezervă Acum' : 'Selectează Pachetul'}
                 </Button>
               </div>
             </Card>
-          ))}
+          );
+        })}
         </div>
 
         {/* Additional Info */}

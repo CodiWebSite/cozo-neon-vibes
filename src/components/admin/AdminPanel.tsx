@@ -11,6 +11,7 @@ import ServicesEditor from './ServicesEditor';
 import PackagesEditor from './PackagesEditor';
 import TestimonialsEditor from './TestimonialsEditor';
 import ContactEditor from './ContactEditor';
+import ContentManager from './ContentManager';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('gallery');
@@ -39,13 +40,14 @@ const AdminPanel = () => {
       </div>
 
       <Tabs defaultValue="gallery" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-6 mb-6">
+        <TabsList className="grid grid-cols-7 mb-6">
           <TabsTrigger value="gallery">Galerie</TabsTrigger>
           <TabsTrigger value="about">Despre</TabsTrigger>
           <TabsTrigger value="services">Servicii</TabsTrigger>
           <TabsTrigger value="packages">Pachete</TabsTrigger>
           <TabsTrigger value="testimonials">Testimoniale</TabsTrigger>
           <TabsTrigger value="contact">Contact</TabsTrigger>
+          <TabsTrigger value="content">Conținut</TabsTrigger>
         </TabsList>
         <TabsContent value="gallery">
           <GalleryEditor />
@@ -64,6 +66,9 @@ const AdminPanel = () => {
         </TabsContent>
         <TabsContent value="contact">
           <ContactEditor />
+        </TabsContent>
+        <TabsContent value="content">
+          <ContentManager />
         </TabsContent>
       </Tabs>
     </div>

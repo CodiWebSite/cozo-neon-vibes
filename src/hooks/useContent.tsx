@@ -17,7 +17,7 @@ export interface Service {
   title: string;
   description: string;
   features: string[];
-  icon: React.ComponentType<any>;
+  icon: string;
   image: string;
   gradient: string;
 }
@@ -30,7 +30,7 @@ export interface Package {
   price: string;
   features: string[];
   isPopular: boolean;
-  icon: React.ComponentType<any>;
+  icon: string;
   gradient: string;
 }
 
@@ -46,6 +46,10 @@ export interface ContactInfo {
   email: string;
   address: string;
   schedule: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  tiktok?: string;
 }
 
 interface SiteDataContextType {
@@ -103,7 +107,7 @@ const initialServices: Service[] = [
     title: 'DJ pentru Nunți',
     description: 'Creez atmosfera perfectă pentru ziua voastră specială cu muzică adaptată gusturilor voastre și ale invitaților.',
     features: ['Consultare pre-eveniment', 'Sistem audio profesional', 'Iluminat ambientală', 'Backup echipamente'],
-    icon: Heart,
+    icon: 'Heart',
     image: '/src/assets/wedding-dj.jpg',
     gradient: 'from-pink-500 to-rose-600'
   },
@@ -112,7 +116,7 @@ const initialServices: Service[] = [
     title: 'Evenimente Private',
     description: 'Petreceri private, aniversări și celebrări intime cu muzică personalizată pentru fiecare moment.',
     features: ['Playlist personalizat', 'Echipamente portabile', 'Flexibilitate program', 'Consultare muzicală'],
-    icon: Users,
+    icon: 'Users',
     image: '/src/assets/private-party.jpg',
     gradient: 'from-blue-500 to-purple-600'
   },
@@ -121,7 +125,7 @@ const initialServices: Service[] = [
     title: 'Evenimente Corporative',
     description: 'Profesionalism și eleganță pentru lansări de produse, conferințe și petreceri corporative.',
     features: ['Echipamente premium', 'Prezentare profesională', 'Coordonare cu organizatorii', 'Backup plan'],
-    icon: Briefcase,
+    icon: 'Briefcase',
     image: '/src/assets/corporate-event.jpg',
     gradient: 'from-green-500 to-teal-600'
   },
@@ -130,7 +134,7 @@ const initialServices: Service[] = [
     title: 'Club & Evenimente Publice',
     description: 'Energie și ritm pentru cluburi, festivaluri și evenimente publice de amploare.',
     features: ['Mixuri live', 'Interacțiune cu publicul', 'Echipamente club standard', 'Repertoriu extins'],
-    icon: Music,
+    icon: 'Music',
     image: '/src/assets/club-night.jpg',
     gradient: 'from-orange-500 to-red-600'
   }
@@ -145,7 +149,7 @@ const initialPackages: Package[] = [
     price: '800 RON',
     features: ['DJ profesionist', 'Sistem audio basic', 'Playlist personalizat', 'Consultare pre-eveniment'],
     isPopular: false,
-    icon: Zap,
+    icon: 'Zap',
     gradient: 'from-blue-500 to-purple-600'
   },
   {
@@ -156,7 +160,7 @@ const initialPackages: Package[] = [
     price: '1200 RON',
     features: ['DJ profesionist', 'Sistem audio premium', 'Iluminat ambientală', 'Microfon wireless', 'Backup echipamente', 'Consultare detaliată'],
     isPopular: true,
-    icon: Star,
+    icon: 'Star',
     gradient: 'from-pink-500 to-rose-600'
   },
   {
@@ -167,7 +171,7 @@ const initialPackages: Package[] = [
     price: '1800 RON',
     features: ['DJ profesionist', 'Sistem audio premium', 'Iluminat profesional', 'Efecte speciale', 'Microfoane wireless', 'Backup complet', 'Asistent tehnic', 'Consultare nelimitată'],
     isPopular: false,
-    icon: Crown,
+    icon: 'Crown',
     gradient: 'from-yellow-500 to-orange-600'
   }
 ];
