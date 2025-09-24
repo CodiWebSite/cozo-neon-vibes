@@ -58,11 +58,11 @@ const Footer = () => {
                 <span>+40 749 800 325</span>
               </a>
               <a 
-                href="mailto:contact@djcozo.ro" 
+                href="mailto:contact@dj-cozo.ro" 
                 className="flex items-center space-x-2 text-muted-foreground hover:text-primary smooth-transition"
               >
                 <Mail className="w-4 h-4" />
-                <span>contact@djcozo.ro</span>
+                <span>contact@dj-cozo.ro</span>
               </a>
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
@@ -145,10 +145,8 @@ const Footer = () => {
         {/* Bottom Footer */}
         <div className="py-6 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-2 text-muted-foreground text-sm">
+            <div className="flex items-center space-x-4 text-muted-foreground text-sm">
               <span>© {currentYear} DJ Cozo. Toate drepturile rezervate.</span>
-              <span className="text-border">•</span>
-              <a href="/admin/auth" className="hover:text-primary smooth-transition text-xs opacity-50">Admin</a>
             </div>
             
             <div className="flex items-center space-x-2 text-muted-foreground text-sm">

@@ -2,17 +2,13 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, Star, Zap, Crown } from 'lucide-react';
-import { useContent } from "@/hooks/useContent";
 
 const Packages = () => {
-  const { getContent, packages: contextPackages } = useContent();
-  
-  // Folosim pachetele din context dacă există, altfel folosim datele statice
-  const defaultPackages = [
+  // Date statice pentru pachete
+  const packages = [
     {
       name: "Starter",
       icon: Zap,
-      price: "400",
       duration: "4 ore",
       description: "Perfect pentru petreceri mici și evenimente private",
       features: [
@@ -28,7 +24,6 @@ const Packages = () => {
     {
       name: "Professional",
       icon: Star,
-      price: "650",
       duration: "6 ore",
       description: "Cel mai popular pachet pentru nunți și evenimente corporate",
       features: [
@@ -46,7 +41,6 @@ const Packages = () => {
     {
       name: "Premium",
       icon: Crown,
-      price: "900",
       duration: "8 ore",
       description: "Experiență completă cu toate serviciile incluse",
       features: [
@@ -64,9 +58,6 @@ const Packages = () => {
       gradient: "from-amber-500 to-orange-500",
     },
   ];
-  
-  // Folosim pachetele din context dacă există, altfel folosim datele statice
-  const packages = contextPackages && contextPackages.length > 0 ? contextPackages : defaultPackages;
 
   const scrollToContact = () => {
     const element = document.getElementById('contact');

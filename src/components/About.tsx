@@ -2,10 +2,8 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Music, Award, Users, Clock } from 'lucide-react';
 import djPortrait from "@/assets/dj-portrait.jpg";
-import { useContent } from "@/hooks/useContent";
 
 const About = () => {
-  const { getContent } = useContent();
   const stats = [
     {
       icon: Music,

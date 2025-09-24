@@ -1,0 +1,72 @@
+{
+    "hero": {
+        "title": "DJ Cozo - Muzică pentru evenimente speciale",
+        "text": "Transformă orice eveniment într-o experiență de neuitat cu muzica perfectă.",
+        "image": "\/images\/hero-bg.jpg"
+    },
+    "about": {
+        "title": "Despre mine",
+        "text": "Cu peste 10 ani de experiență în industria muzicală, aduc energia și pasiunea în fiecare eveniment."
+    },
+    "services": {
+        "title": "Servicii",
+        "intro": "Pachete personalizate pentru fiecare tip de eveniment",
+        "packages": [
+            {
+                "name": "Pachet Basic",
+                "features": [
+                    "4 ore de muzică",
+                    "Sistem audio profesional",
+                    "Lumini de bază"
+                ],
+                "image": "\/images\/package-basic.jpg"
+            },
+            {
+                "name": "Pachet Premium",
+                "features": [
+                    "6 ore de muzică",
+                    "Sistem audio premium",
+                    "Show de lumini",
+                    "Microfon wireless"
+                ],
+                "image": "\/images\/package-premium.jpg"
+            },
+            {
+                "name": "Pachet VIP",
+                "features": [
+                    "8 ore de muzică",
+                    "Sistem audio top",
+                    "Show de lumini complet",
+                    "2 microfoane",
+                    "Efecte speciale"
+                ],
+                "image": "\/images\/package-vip.jpg"
+            }
+        ]
+    },
+    "gallery": [],
+    "reviews": [
+        {
+            "id": "1",
+            "text": "DJ Cozo a făcut nunta noastră perfectă! Muzica a fost extraordinară.",
+            "author": "Maria și Alexandru"
+        },
+        {
+            "id": "2",
+            "text": "Profesionalism și energie de la început până la sfârșit. Recomand cu încredere!",
+            "author": "Ana Popescu"
+        }
+    ],
+    "contact": {
+        "title": "Contactează-mă",
+        "subtitle": "Să discutăm despre evenimentul tău special",
+        "phone": "+40 749 800 325",
+        "email": "contact@dj-cozo.ro",
+        "address": "București, România",
+        "socialLinks": {
+            "facebook": "https:\/\/facebook.com\/djcozo",
+            "instagram": "https:\/\/instagram.com\/djcozo",
+            "youtube": "https:\/\/youtube.com\/djcozo"
+        }
+    }
+}

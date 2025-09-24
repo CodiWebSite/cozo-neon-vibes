@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { useContent } from "@/hooks/useContent";
 import { 
   Phone, 
   Mail, 
@@ -16,27 +15,21 @@ import {
   Calendar,
   Music,
   Facebook,
-  Instagram,
-  Youtube
+  Instagram
 } from 'lucide-react';
 
 const Contact = () => {
-  const { getContent, contactInfo: contextContactInfo } = useContent();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
-  // Folosim informațiile de contact din context dacă există, altfel folosim datele statice
-  const defaultContactInfo = {
-    phone: "+40 742 123 456",
-    email: "contact@djcozo.ro",
-    instagram: "https://www.instagram.com/djcozo",
-    facebook: "https://www.facebook.com/djcozo",
-    youtube: "https://www.youtube.com/djcozo",
-    tiktok: "https://www.tiktok.com/@djcozo"
+  // Date statice pentru contact
+  const contactData = {
+    phone: "+40 749 800 325",
+    email: "contact@dj-cozo.ro",
+    instagram: "https://www.instagram.com/djcozo/",
+    facebook: "https://www.facebook.com/DJDavidCozo",
+    tiktok: "https://www.tiktok.com/@davidcozo"
   };
-  
-  // Folosim informațiile de contact din context dacă există, altfel folosim datele statice
-  const contactData = contextContactInfo ? contextContactInfo : defaultContactInfo;
   
   const [formData, setFormData] = useState({
     name: '',
@@ -58,22 +51,40 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/send-email.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Mesaj trimis cu succes!",
+          description: "Îți voi răspunde în cel mai scurt timp posibil.",
+        });
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          event_type: '',
+          event_date: '',
+          message: ''
+        });
+      } else {
+        throw new Error('Eroare la trimiterea mesajului');
+      }
+    } catch (error) {
       toast({
-        title: "Mesaj trimis cu succes!",
-        description: "Îți voi răspunde în cel mai scurt timp posibil.",
+        title: "Eroare la trimiterea mesajului",
+        description: "Te rog să încerci din nou sau să mă contactezi direct.",
+        variant: "destructive"
       });
+    } finally {
       setIsSubmitting(false);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        eventType: '',
-        eventDate: '',
-        message: ''
-      });
-    }, 1000);
+    }
   };
 
   const contactInfoDisplay = [
@@ -103,7 +114,7 @@ const Contact = () => {
     }
   ];
 
-  const whatsappMessage = encodeURIComponent("Salut DJ Cozo! Sunt interesdat de serviciile tale pentru evenimentul meu. Poți să îmi dai mai multe detalii?");
+  const whatsappMessage = encodeURIComponent("Salut DJ Cozo! Sunt interesat de serviciile tale pentru evenimentul meu. Poți să îmi dai mai multe detalii?");
 
   return (
     <section id="contact" className="section-spacing">
@@ -185,8 +196,8 @@ const Contact = () => {
                       Tip Eveniment *
                     </label>
                     <select
-                      name="eventType"
-                      value={formData.eventType}
+                      name="event_type"
+                      value={formData.event_type}
                       onChange={handleInputChange}
                       required
                       className="w-full px-3 py-2 bg-background/50 border border-border rounded-md text-foreground focus:neon-border smooth-transition"
@@ -206,9 +217,9 @@ const Contact = () => {
                     Data Evenimentului
                   </label>
                   <Input
-                    name="eventDate"
+                    name="event_date"
                     type="date"
-                    value={formData.eventDate}
+                    value={formData.event_date}
                     onChange={handleInputChange}
                     className="bg-background/50 border-border focus:neon-border"
                   />
@@ -328,9 +339,6 @@ const Contact = () => {
                     </a>
                     <a href={contactData.instagram} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
                       <Instagram className="h-5 w-5 text-primary" />
-                    </a>
-                    <a href={contactData.youtube} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
-                      <Youtube className="h-5 w-5 text-primary" />
                     </a>
                     <a href={contactData.tiktok} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
                       <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

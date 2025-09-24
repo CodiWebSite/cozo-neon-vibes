@@ -2,17 +2,14 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, Building, PartyPopper, Users } from 'lucide-react';
-import { useContent } from "@/hooks/useContent";
 import weddingImage from '@/assets/wedding-dj.jpg';
 import corporateImage from '@/assets/corporate-event.jpg';
 import clubImage from '@/assets/club-night.jpg';
 import privateImage from '@/assets/private-party.jpg';
 
 const Services = () => {
-  const { getContent, services: contextServices } = useContent();
-  
-  // Folosim serviciile din context dacă există, altfel folosim datele statice
-  const defaultServices = [
+  // Date statice pentru servicii
+  const services = [
     {
       icon: Heart,
       title: "Nunți",
@@ -46,9 +43,6 @@ const Services = () => {
       gradient: "from-amber-500 to-orange-500",
     },
   ];
-  
-  // Folosim serviciile din context dacă există, altfel folosim datele statice
-  const services = contextServices && contextServices.length > 0 ? contextServices : defaultServices;
 
   const scrollToContact = () => {
     const element = document.getElementById('contact');

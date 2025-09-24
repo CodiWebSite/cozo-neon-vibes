@@ -1,7 +1,6 @@
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useContent } from "@/hooks/useContent";
 
 const DARKEN_IFRAME = true; // setează false și folosește varianta cu invert/filter (experimental)
 
@@ -65,10 +64,8 @@ const IFrameBox = ({ src }: { src: string }) => {
 };
 
 const Testimonials = () => {
-  const { getContent, testimonials: contextTestimonials } = useContent();
-  
-  // Folosim testimonialele din context dacă există, altfel folosim datele statice
-  const defaultTestimonials = [
+  // Date statice pentru testimoniale
+  const testimonials = [
     {
       name: "Alexandra & Mihai",
       role: "Miri",
@@ -88,9 +85,6 @@ const Testimonials = () => {
       image: "/testimonials/owner1.jpg"
     }
   ];
-  
-  // Folosim testimonialele din context dacă există, altfel folosim datele statice
-  const testimonials = contextTestimonials && contextTestimonials.length > 0 ? contextTestimonials : defaultTestimonials;
   
   return (
     <section id="testimoniale" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
