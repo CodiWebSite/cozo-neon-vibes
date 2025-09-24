@@ -84,78 +84,79 @@ const Packages = () => {
         </div>
 
         {/* Packages Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-12">
           {packages.map((pkg, index) => (
-            <Card 
-              key={index}
-              className={`relative overflow-hidden group ${
-                pkg.popular 
-                  ? 'ring-2 ring-primary/50 bg-card/80 border-primary/30 scale-105' 
-                  : 'bg-card/50 border-border/50'
-              } hover:neon-border smooth-transition`}
-            >
-              {/* Popular Badge */}
-              {pkg.popular && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                  <Badge className={`bg-gradient-to-r ${pkg.gradient} text-white glow-effect px-4 py-1`}>
-                    Cel Mai Popular
-                  </Badge>
-                </div>
-              )}
-
-              <div className="p-6 space-y-6">
-                {/* Header */}
-                <div className="text-center space-y-4">
-                  <div className={`inline-flex p-3 rounded-full bg-gradient-to-br ${pkg.gradient} glow-effect`}>
-                    <pkg.icon className="w-6 h-6 text-white" />
+            <div key={index} className={`${pkg.popular ? 'pt-6' : 'pt-0'} flex flex-col h-full`}>
+              <Card 
+                className={`relative overflow-hidden group flex-1 ${
+                  pkg.popular 
+                    ? 'ring-2 ring-primary/50 bg-card/80 border-primary/30 transform scale-105' 
+                    : 'bg-card/50 border-border/50'
+                } hover:neon-border smooth-transition`}
+              >
+                {/* Popular Badge */}
+                {pkg.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className={`bg-gradient-to-r ${pkg.gradient} text-white glow-effect px-4 py-1 whitespace-nowrap`}>
+                      Cel Mai Popular
+                    </Badge>
                   </div>
-                  
-                  <div>
-                    <h3 className="text-xl font-heading font-bold text-foreground">
-                      {pkg.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {pkg.description}
-                    </p>
-                  </div>
+                )}
 
-                  <div className="space-y-1">
-                    <p className="text-lg font-semibold gradient-text">
-                      {pkg.duration} eveniment
-                    </p>
-                  </div>
-                </div>
-
-                {/* Features */}
-                <div className="space-y-3">
-                  {pkg.features.map((feature, featureIndex) => (
-                    <div 
-                      key={featureIndex}
-                      className="flex items-center space-x-3"
-                    >
-                      <div className={`p-1 rounded-full bg-gradient-to-br ${pkg.gradient}`}>
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {feature}
-                      </span>
+                <div className="p-6 space-y-6">
+                  {/* Header */}
+                  <div className="text-center space-y-4">
+                    <div className={`inline-flex p-3 rounded-full bg-gradient-to-br ${pkg.gradient} glow-effect`}>
+                      <pkg.icon className="w-6 h-6 text-white" />
                     </div>
-                  ))}
-                </div>
+                    
+                    <div>
+                      <h3 className="text-xl font-heading font-bold text-foreground">
+                        {pkg.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {pkg.description}
+                      </p>
+                    </div>
 
-                {/* CTA Button */}
-                <Button 
-                  className={`w-full ${
-                    pkg.popular 
-                      ? `bg-gradient-to-r ${pkg.gradient} hover:scale-105 glow-effect text-white` 
-                      : 'neon-border hover:glow-effect hover:bg-secondary/50'
-                  } smooth-transition`}
-                  onClick={scrollToContact}
-                >
-                  {pkg.popular ? 'Rezervă Acum' : 'Selectează Pachetul'}
-                </Button>
-              </div>
-            </Card>
+                    <div className="space-y-1">
+                      <p className="text-lg font-semibold gradient-text">
+                        {pkg.duration} eveniment
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div className="space-y-3">
+                    {pkg.features.map((feature, featureIndex) => (
+                      <div 
+                        key={featureIndex}
+                        className="flex items-center space-x-3"
+                      >
+                        <div className={`p-1 rounded-full bg-gradient-to-br ${pkg.gradient}`}>
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button 
+                    className={`w-full ${
+                      pkg.popular 
+                        ? `bg-gradient-to-r ${pkg.gradient} hover:scale-105 glow-effect text-white` 
+                        : 'neon-border hover:glow-effect hover:bg-secondary/50'
+                    } smooth-transition`}
+                    onClick={scrollToContact}
+                  >
+                    {pkg.popular ? 'Rezervă Acum' : 'Selectează Pachetul'}
+                  </Button>
+                </div>
+              </Card>
+            </div>
           ))}
         </div>
 
