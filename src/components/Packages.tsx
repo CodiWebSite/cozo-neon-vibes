@@ -84,20 +84,20 @@ const Packages = () => {
         </div>
 
         {/* Packages Grid */}
-        <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-12 pt-8">
           {packages.map((pkg, index) => (
-            <div key={index} className={`${pkg.popular ? 'pt-6' : 'pt-0'} flex flex-col h-full`}>
+            <div key={index} className={`${pkg.popular ? 'pt-8' : 'pt-0'} flex flex-col h-full`}>
               <Card 
-                className={`relative overflow-hidden group flex-1 ${
+                className={`relative group flex-1 ${
                   pkg.popular 
-                    ? 'ring-2 ring-primary/50 bg-card/80 border-primary/30 transform scale-105' 
+                    ? 'ring-2 ring-primary/50 bg-card/80 border-primary/30 transform scale-105 mt-4' 
                     : 'bg-card/50 border-border/50'
                 } hover:neon-border smooth-transition`}
               >
                 {/* Popular Badge */}
                 {pkg.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                    <Badge className={`bg-gradient-to-r ${pkg.gradient} text-white glow-effect px-4 py-1 whitespace-nowrap`}>
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className={`bg-gradient-to-r ${pkg.gradient} text-white glow-effect px-6 py-2 text-sm font-semibold whitespace-nowrap shadow-lg`}>
                       Cel Mai Popular
                     </Badge>
                   </div>
