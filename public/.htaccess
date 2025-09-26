@@ -5,8 +5,20 @@ RewriteEngine On
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Exclude API directory and PHP files from SPA routing
+# Increase upload limits
+php_value upload_max_filesize 50M
+php_value post_max_size 50M
+php_value max_execution_time 300
+php_value max_input_time 300
+
+# Security headers for uploads
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|mp4|webm|ogg|avi|mov)$">
+    Header set Cache-Control "public, max-age=31536000"
+</FilesMatch>
+
+# Exclude API directory, uploads directory and PHP files from SPA routing
 RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !^/uploads/
 RewriteCond %{REQUEST_URI} !\.php$
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.html [QSA,L]

@@ -1,94 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
-
-// Import imagini
-import djPortrait from '@/assets/dj-portrait.jpg';
-import heroImage from '@/assets/hero-dj-new.jpg';
-import clubNight from '@/assets/club-night.jpg';
-import privateParty from '@/assets/private-party.jpg';
-import weddingDj from '@/assets/wedding-dj.jpg';
-import corporateEvent from '@/assets/corporate-event.jpg';
+import { X, ChevronLeft, ChevronRight, Play, Upload } from 'lucide-react';
 
 interface GalleryItem {
   id: string;
-  url?: string;
-  iframe?: string;
   title: string;
   category: string;
   type: 'image' | 'video';
-  thumbnail?: string; // Pentru preview-urile video-urilor
+  src?: string;
+  alt?: string;
+  videoUrl?: string;
+  videoType?: string;
+  videoId?: string;
+  thumbnail?: string;
+  originalUrl?: string;
+  created_at: string;
 }
 
 const Gallery = () => {
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Date pentru galerie - pozele din assets și video-urile Facebook
-  const galleryItems: GalleryItem[] = [
-    // Pozele din directorul assets
-    {
-      id: '1',
-      url: djPortrait,
-      title: 'DJ Cozo - Portret Profesional',
-      category: 'Portrete',
-      type: 'image'
-    },
-    {
-      id: '2',
-      url: heroImage,
-      title: 'DJ în Acțiune',
-      category: 'Performance',
-      type: 'image'
-    },
-    {
-      id: '3',
-      url: clubNight,
-      title: 'Noapte de Club',
-      category: 'Evenimente Club',
-      type: 'image'
-    },
-    {
-      id: '4',
-      url: privateParty,
-      title: 'Petrecere Privată',
-      category: 'Evenimente Private',
-      type: 'image'
-    },
-    {
-      id: '5',
-      url: weddingDj,
-      title: 'DJ pentru Nuntă',
-      category: 'Nunți',
-      type: 'image'
-    },
-    {
-      id: '6',
-      url: corporateEvent,
-      title: 'Eveniment Corporate',
-      category: 'Evenimente Corporate',
-      type: 'image'
-    },
-    // Video-urile Facebook cu thumbnail-uri custom
-    {
-      id: '7',
-      iframe: 'https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F765208199668322%2F&show_text=false&width=267&t=0',
-      title: 'DJ Cozo - Performance Live',
-      category: 'Video Performance',
-      type: 'video',
-      thumbnail: djPortrait // Folosim o imagine ca thumbnail
-    },
-    {
-      id: '8',
-      iframe: 'https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1821184761810188%2F&show_text=false&width=267&t=0',
-      title: 'DJ Cozo - Mix Session',
-      category: 'Video Performance',
-      type: 'video',
-      thumbnail: clubNight // Folosim o imagine ca thumbnail
+  // Încărcăm imaginile din API
+  useEffect(() => {
+    fetchGalleryItems();
+  }, []);
+
+  const fetchGalleryItems = async () => {
+    try {
+      const response = await fetch('/api/gallery.php');
+      if (response.ok) {
+        const items = await response.json();
+        setGalleryItems(items);
+      }
+    } catch (error) {
+      console.error('Eroare la încărcarea galeriei:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const openLightbox = (index: number) => {
     setSelectedItem(index);
@@ -120,40 +74,58 @@ const Gallery = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Galerie <span className="text-neon-blue">Foto & Video</span>
+            Galerie <span className="text-neon-cyan">Foto & Video</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Descoperă momentele speciale și energia unică din evenimentele mele
           </p>
         </div>
 
-        {/* Filtre categorii */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {categories.map((category) => (
-            <Badge 
-              key={category} 
-              variant="outline" 
-              className="border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black transition-colors cursor-pointer"
-            >
-              {category}
-            </Badge>
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-neon-cyan"></div>
+            <p className="text-gray-300 mt-4">Se încarcă galeria...</p>
+          </div>
+        ) : galleryItems.length === 0 ? (
+          <div className="text-center py-20">
+            <Upload className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-2xl font-semibold text-white mb-4">Galeria este goală</h3>
+            <p className="text-gray-400 max-w-md mx-auto">
+              Momentan nu există imagini sau video-uri în galerie. 
+              Acestea vor fi adăugate în curând prin panoul de administrare.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Filtre categorii */}
+            {categories.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-4 mb-12">
+                {categories.map((category) => (
+                  <Badge 
+                    key={category} 
+                    variant="outline" 
+                    className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black transition-colors cursor-pointer"
+                  >
+                    {category}
+                  </Badge>
+                ))}
+              </div>
+            )}
 
-        {/* Grid galerie */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {galleryItems.map((item, index) => (
+            {/* Grid galerie */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {galleryItems.map((item, index) => (
             <Dialog key={item.id}>
               <DialogTrigger asChild>
                 <Card 
-                  className="group cursor-pointer overflow-hidden bg-gray-900 border-gray-800 hover:border-neon-blue transition-all duration-300"
+                  className="group cursor-pointer overflow-hidden bg-gray-900 border-gray-800 hover:border-neon-cyan transition-all duration-300"
                   onClick={() => openLightbox(index)}
                 >
                   <div className="relative aspect-square overflow-hidden">
                     {item.type === 'image' ? (
                       <img
-                        src={item.url}
-                        alt={item.title}
+                        src={item.src}
+                        alt={item.alt || item.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
@@ -165,8 +137,8 @@ const Gallery = () => {
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <div className="bg-neon-blue/20 rounded-full p-4 backdrop-blur-sm">
-                            <Play className="w-12 h-12 text-neon-blue fill-current" />
+                          <div className="bg-neon-cyan/20 rounded-full p-4 backdrop-blur-sm">
+                  <Play className="w-12 h-12 text-neon-cyan fill-current" />
                           </div>
                         </div>
                         <div className="absolute top-2 right-2">
@@ -179,7 +151,7 @@ const Gallery = () => {
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <div className="text-center text-white">
                         <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                        <Badge variant="outline" className="border-neon-blue text-neon-blue">
+                        <Badge variant="outline" className="border-neon-cyan text-neon-cyan">
                           {item.category}
                         </Badge>
                       </div>
@@ -189,7 +161,9 @@ const Gallery = () => {
               </DialogTrigger>
             </Dialog>
           ))}
-        </div>
+            </div>
+          </>
+        )}
 
         {/* Lightbox */}
         {isLightboxOpen && selectedItem !== null && (
@@ -224,22 +198,30 @@ const Gallery = () => {
                 <div className="w-full h-full flex items-center justify-center p-8">
                   {galleryItems[selectedItem].type === 'image' ? (
                     <img
-                      src={galleryItems[selectedItem].url}
-                      alt={galleryItems[selectedItem].title}
+                      src={galleryItems[selectedItem].src}
+                      alt={galleryItems[selectedItem].alt || galleryItems[selectedItem].title}
                       className="max-w-full max-h-full object-contain"
                     />
                   ) : (
-                    <iframe
-                      src={galleryItems[selectedItem].iframe}
-                      width="400"
-                      height="600"
-                      style={{ border: 'none', overflow: 'hidden' }}
-                      scrolling="no"
-                      frameBorder="0"
-                      allowFullScreen={true}
-                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                      className="max-w-full max-h-full rounded-lg"
-                    />
+                    // Verifică tipul de video pentru a decide între iframe și tag video
+                    galleryItems[selectedItem].videoType === 'file' ? (
+                      <video
+                        src={galleryItems[selectedItem].videoUrl}
+                        controls
+                        className="max-w-full max-h-full rounded-lg"
+                        style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+                      />
+                    ) : (
+                      <iframe
+                        src={galleryItems[selectedItem].videoUrl}
+                        className="w-full h-full rounded-lg"
+                        style={{ maxWidth: '90vw', maxHeight: '90vh', minHeight: '500px' }}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={galleryItems[selectedItem].title}
+                      />
+                    )
                   )}
                 </div>
 
@@ -248,7 +230,7 @@ const Gallery = () => {
                   <h3 className="text-white text-xl font-semibold mb-2">
                     {galleryItems[selectedItem].title}
                   </h3>
-                  <Badge variant="outline" className="border-neon-blue text-neon-blue">
+                  <Badge variant="outline" className="border-neon-cyan text-neon-cyan">
                     {galleryItems[selectedItem].category}
                   </Badge>
                   <p className="text-gray-400 text-sm mt-2">

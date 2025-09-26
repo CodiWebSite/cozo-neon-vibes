@@ -64,25 +64,31 @@ const IFrameBox = ({ src }: { src: string }) => {
 };
 
 const Testimonials = () => {
-  // Date statice pentru testimoniale
+  // Recenzii reale de pe Facebook
   const testimonials = [
     {
-      name: "Alexandra & Mihai",
-      role: "Miri",
-      content: "DJ Cozo a creat atmosfera perfectă la nunta noastră! Toți invitații au dansat până dimineața și am primit numeroase complimente pentru muzică.",
-      image: "/testimonials/couple1.jpg"
+      name: "Medeea Buta",
+      role: "Majorat",
+      content: "Am avut parte de un majorat absolut reușit, iar o mare parte din merit i se datorează DJ-ului! Atmosfera a fost super bine întreținută, iar colegii mei au avut numai cuvinte de laudă. Mi-a plăcut foarte mult cum a știut să interacționeze cu invitații, nu a fost genul care doar pune muzică și atât, ci chiar a vorbit cu noi, a făcut glume, a știut exact când să ne cheme pe ringul de dans și cum să ridice vibe-ul.",
+      image: "/testimonials/medeea.jpg"
     },
     {
-      name: "Elena Popescu",
-      role: "Manager evenimente",
-      content: "Am colaborat cu DJ Cozo pentru mai multe evenimente corporate și de fiecare dată a fost extrem de profesionist. Recomand cu încredere!",
-      image: "/testimonials/manager1.jpg"
+      name: "Irina Alexandra",
+      role: "Nuntă",
+      content: "Am avut parte de cea mai frumoasa nunta alaturi de DJ Cozo, el a facut toata atmosfera, a tinut invitatii foarte activi pe ringul de dans, muzica foarte bine aleasa, a stiut sa sa se plieze exact pe genul invitatilor nostri. Cel mai important lucru pe care l-am apreciat enorm a fost comunicarea cu el, a facut exact cum am cerut, ba chiar mai mult. Am fost o mireasa extrem de multumita! Recomand din suflet!",
+      image: "/testimonials/irina.jpg"
     },
     {
-      name: "Andrei Ionescu",
-      role: "Proprietar club",
-      content: "De când colaborăm cu DJ Cozo, clubul nostru este plin în fiecare weekend. Are un simț extraordinar pentru ce vrea publicul să asculte.",
-      image: "/testimonials/owner1.jpg"
+      name: "Malina Ipate",
+      role: "Majorat",
+      content: "DJ Cozo a fost alegerea perfectă pentru majoratul meu! A creat o atmosferă super energică, cu muzică pe toate gusturile și momente bine gândite pe parcursul serii. A ținut publicul în priză de la început până la final, iar ringul de dans a fost plin tot timpul. A fost atent la preferințele mele, a comunicat bine și s-a adaptat rapid la cerințele invitaților. Profesionalism și distracție garantate!",
+      image: "/testimonials/malina.jpg"
+    },
+    {
+      name: "Ștefan Conțu",
+      role: "Eveniment privat",
+      content: "Am avut parte de o experiență extraordinară datorită lui Cozo! Atmosfera a fost perfecta, muzica atent aleasă pentru fiecare moment al petrecerii. Luminile și efectele speciale au transformat complet spațiul, creând un vibe de club, dar cu o notă elegantă. Ce mi-a plăcut cel mai mult a fost felul în care a simțit publicul — a știut mereu ce să pună ca să țină lumea pe ringul de dans. Îl recomand cu toată încrederea!",
+      image: "/testimonials/stefan.jpg"
     }
   ];
   
@@ -94,14 +100,14 @@ const Testimonials = () => {
           <p className="text-lg text-muted-foreground">Testimoniale reale de la evenimente de neuitat</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mt-12">
           {testimonials.map((testimonial, index) => (
             <Card key={index} className="bg-card/50 backdrop-blur-sm border-primary/10 hover:border-primary/20 transition-all duration-300">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-12 w-12 border-2 border-primary/20">
                     <AvatarImage src={testimonial.image} alt={testimonial.name} />
-                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className="bg-primary/20 text-primary font-semibold">{testimonial.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <CardTitle className="text-lg">{testimonial.name}</CardTitle>
@@ -110,12 +116,27 @@ const Testimonials = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <blockquote className="italic text-muted-foreground">
+                <blockquote className="italic text-muted-foreground leading-relaxed">
                   "{testimonial.content}"
                 </blockquote>
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Buton pentru mai multe recenzii */}
+        <div className="text-center mt-12">
+          <a 
+            href="https://www.facebook.com/DJDavidCozo/reviews" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/25"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Mai multe recenzii pe Facebook
+          </a>
         </div>
       </div>
     </section>

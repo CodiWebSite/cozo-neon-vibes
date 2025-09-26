@@ -1,0 +1,62 @@
+[
+  {
+    "id": "starter",
+    "name": "Starter",
+    "icon": "Zap",
+    "duration": "4 ore",
+    "description": "Perfect pentru petreceri mici și evenimente private",
+    "features": [
+      "Echipament DJ profesional",
+      "Repertoriu standard",
+      "Mixing live 4 ore",
+      "Sisteme audio de bază",
+      "Suport tehnic"
+    ],
+    "popular": false,
+    "gradient": "from-blue-500 to-cyan-500",
+    "created_at": "2025-09-25 14:00:00",
+    "updated_at": "2025-09-25 14:00:00"
+  },
+  {
+    "id": "professional",
+    "name": "Professional",
+    "icon": "Star",
+    "duration": "6 ore",
+    "description": "Cel mai popular pachet pentru nunți și evenimente corporate",
+    "features": [
+      "Echipament premium",
+      "Repertoriu extins personalizat",
+      "Mixing live 6 ore",
+      "Sisteme audio profesionale",
+      "Iluminat de bază",
+      "Coordonare cu fotograful",
+      "Backup complet echipament"
+    ],
+    "popular": true,
+    "gradient": "from-purple-500 to-violet-500",
+    "created_at": "2025-09-25 14:00:00",
+    "updated_at": "2025-09-25 14:00:00"
+  },
+  {
+    "id": "premium",
+    "name": "Premium",
+    "icon": "Crown",
+    "duration": "8 ore",
+    "description": "Experiență completă cu toate serviciile incluse",
+    "features": [
+      "Echipament top premium",
+      "Repertoriu nelimitat",
+      "Mixing live 8 ore",
+      "Sisteme audio high-end",
+      "Show de lumini complet",
+      "DJ backup disponibil",
+      "Coordonare completă eveniment",
+      "Efecte speciale",
+      "Consultanță muzicală"
+    ],
+    "popular": false,
+    "gradient": "from-amber-500 to-orange-500",
+    "created_at": "2025-09-25 14:00:00",
+    "updated_at": "2025-09-25 14:00:00"
+  }
+]

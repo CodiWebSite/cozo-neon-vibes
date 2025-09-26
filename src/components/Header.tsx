@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logoImg from '@/assets/dj-cozo-logo.png';
+import logoImg from "@/assets/dj-cozo-logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,11 +48,7 @@ const Header = () => {
             className="flex items-center cursor-pointer"
             onClick={() => scrollToSection('hero')}
           >
-            <img 
-              src={logoImg} 
-              alt="DJ Cozo Logo" 
-              className="h-20 w-auto object-contain"
-            />
+            <img src={logoImg} alt="DJ Cozo Logo" className="h-16 w-auto" />
           </div>
 
           {/* Desktop Navigation */}

@@ -1,5 +1,6 @@
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
-import logoImg from '@/assets/dj-cozo-logo.png';
+import { Link } from 'react-router-dom';
+import logoImg from "@/assets/dj-cozo-logo.png";
 
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
@@ -37,11 +38,7 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="space-y-6">
             <div className="flex items-center">
-              <img 
-                src={logoImg} 
-                alt="DJ Cozo Logo" 
-                className="h-20 w-auto object-contain"
-              />
+              <img src={logoImg} alt="DJ Cozo Logo" className="h-20 w-auto mb-4" />
             </div>
             
             <p className="text-muted-foreground leading-relaxed">
@@ -145,8 +142,23 @@ const Footer = () => {
         {/* Bottom Footer */}
         <div className="py-6 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4 text-muted-foreground text-sm">
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 text-muted-foreground text-sm">
               <span>© {currentYear} DJ Cozo. Toate drepturile rezervate.</span>
+              <div className="flex items-center space-x-4">
+                <Link 
+                  to="/politici" 
+                  className="hover:text-primary smooth-transition"
+                >
+                  Politici Legale
+                </Link>
+                <span className="hidden md:inline">•</span>
+                <Link 
+                  to="/politici#confidentialitate" 
+                  className="hover:text-primary smooth-transition"
+                >
+                  Confidențialitate
+                </Link>
+              </div>
             </div>
             
             <div className="flex items-center space-x-2 text-muted-foreground text-sm">

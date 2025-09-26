@@ -1,127 +1,233 @@
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Building, PartyPopper, Users } from 'lucide-react';
-import weddingImage from '@/assets/wedding-dj.jpg';
-import corporateImage from '@/assets/corporate-event.jpg';
-import clubImage from '@/assets/club-night.jpg';
-import privateImage from '@/assets/private-party.jpg';
+import { Music, Users, Building, Heart, Star, Check, Loader2 } from 'lucide-react';
+import { getIconComponent } from '@/lib/iconUtils';
+import weddingImage from "@/assets/wedding-dj.jpg";
+import corporateImage from "@/assets/corporate-event.jpg";
+import clubImage from "@/assets/club-night.jpg";
+import privateImage from "@/assets/private-party.jpg";
+
+interface Service {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  icon: string;
+  features: string[];
+  gradient: string;
+}
 
 const Services = () => {
-  // Date statice pentru servicii
-  const services = [
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Servicii implicite ca fallback
+  const defaultServices: Service[] = [
     {
-      icon: Heart,
+      id: 1,
       title: "Nunți",
-      description: "Muzică romantică și atmosferă perfectă pentru cea mai importantă zi din viața voastră.",
+      description: "Creez atmosfera perfectă pentru cea mai importantă zi din viața voastră",
       image: weddingImage,
-      features: ["Repertoriu personalizat", "Echipament premium", "Coordonare cu fotograful", "Backup garantat"],
-      gradient: "from-pink-500 to-rose-500",
+      icon: "Heart",
+      features: [
+        "Consultanță muzicală personalizată",
+        "Echipamente premium de sunet și lumini",
+        "Mixuri personalizate pentru momentele speciale",
+        "Backup complet pentru siguranță",
+        "Coordonare cu fotograful și videograful"
+      ],
+      gradient: "from-pink-500 to-rose-500"
     },
     {
-      icon: Building,
+      id: 2,
       title: "Evenimente Corporate",
-      description: "Profesionalism și eleganță pentru conferințe, lansări de produse și petreceri corporative.",
+      description: "Profesionalism și eleganță pentru evenimentele voastre de business",
       image: corporateImage,
-      features: ["Prezentare discretă", "Muzică ambientală", "Echipament wireless", "Suport tehnic"],
-      gradient: "from-blue-500 to-cyan-500",
+      icon: "Building",
+      features: [
+        "Prezentare profesională și discretă",
+        "Muzică adaptată publicului corporate",
+        "Sistem de sonorizare pentru prezentări",
+        "Coordonare cu organizatorii evenimentului",
+        "Flexibilitate în programul muzical"
+      ],
+      gradient: "from-blue-500 to-cyan-500"
     },
     {
-      icon: PartyPopper,
+      id: 3,
       title: "Cluburi & Baruri",
-      description: "Energie maximă și hits-uri care țin publicul pe ringul de dans toată noaptea.",
+      description: "Energie pură și vibrații electrizante pentru nopțile de neuitat",
       image: clubImage,
-      features: ["Mixing live", "Hits comerciale", "Lecturi de public", "Efecte speciale"],
-      gradient: "from-purple-500 to-violet-500",
+      icon: "Music",
+      features: [
+        "Mixuri live adaptate energiei publicului",
+        "Repertoriu vast de muzică electronică",
+        "Interacțiune cu publicul",
+        "Efecte speciale de lumini și sunet",
+        "Experiență în cluburi de top"
+      ],
+      gradient: "from-purple-500 to-violet-500"
     },
     {
-      icon: Users,
+      id: 4,
       title: "Evenimente Private",
-      description: "Petreceri private, aniversări și celebrări intime cu atmosfera dorită de tine.",
+      description: "Petreceri personalizate pentru momente speciale cu prietenii",
       image: privateImage,
-      features: ["Playlist personalizat", "Flexibilitate maximă", "Echipament compact", "Preț accesibil"],
-      gradient: "from-amber-500 to-orange-500",
-    },
+      icon: "Users",
+      features: [
+        "Atmosferă intimă și personalizată",
+        "Playlist-uri create special pentru voi",
+        "Echipamente adaptate spațiului",
+        "Flexibilitate maximă în program",
+        "Prețuri accesibile pentru grupuri mici"
+      ],
+      gradient: "from-emerald-500 to-teal-500"
+    }
   ];
 
-  const scrollToContact = () => {
-    const element = document.getElementById('contact');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  const fetchServices = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/services.php');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch services');
+      }
+      
+      const data = await response.json();
+      
+      if (Array.isArray(data) && data.length > 0) {
+        // Convertim path-urile imaginilor pentru a folosi imaginile locale
+        const servicesWithImages = data.map(service => ({
+          ...service,
+          image: getServiceImage(service.image)
+        }));
+        setServices(servicesWithImages);
+        setError(null);
+      } else {
+        // Folosim serviciile implicite dacă API-ul nu returnează date
+        setServices(defaultServices);
+      }
+    } catch (err) {
+      console.error('Error fetching services:', err);
+      setError('Failed to load services - Se afișează serviciile implicite');
+      setServices(defaultServices);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const getServiceImage = (imagePath: string) => {
+    // Mapăm path-urile din API la imaginile locale
+    const imageMap: { [key: string]: string } = {
+      '/src/assets/wedding-dj.jpg': weddingImage,
+      '/src/assets/corporate-event.jpg': corporateImage,
+      '/src/assets/club-night.jpg': clubImage,
+      '/src/assets/private-party.jpg': privateImage
+    };
+    
+    return imageMap[imagePath] || imagePath;
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="services" className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-4" />
+              <p className="text-gray-300">Se încarcă serviciile...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id="servicii" className="section-spacing">
-      <div className="container-custom">
+    <section id="services" className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge variant="outline" className="neon-border text-primary mb-4">
-            Servicii Premium
+        <div className="text-center mb-16">
+          <Badge variant="outline" className="border-cyan-400 text-cyan-400 mb-4">
+            Servicii DJ Premium
           </Badge>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6">
-            <span className="gradient-text">Servicii</span> pentru Orice{" "}
-            <span className="gradient-text-secondary">Ocazie</span>
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+            Servicii DJ <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Premium</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Oferă fiecărui eveniment atmosfera perfectă cu servicii DJ profesionale 
-            adaptate nevoilor tale specifice.
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Oferim servicii complete de DJ în Iași pentru toate tipurile de evenimente: DJ nunți, evenimente corporate, petreceri private și cluburi, cu echipamente premium și experiență vastă în Moldova
           </p>
+          {error && (
+            <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-red-400 text-sm max-w-md mx-auto">
+              {error}
+            </div>
+          )}
         </div>
 
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 gap-8">
-          {services.map((service, index) => (
-            <Card 
-              key={index}
-              className="group overflow-hidden bg-card/50 border-border/50 hover:neon-border smooth-transition"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={service.image}
-                  alt={`DJ Cozo ${service.title} Services`}
-                  className="w-full h-full object-cover group-hover:scale-110 smooth-transition"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-background/80 to-transparent"></div>
-                
-                {/* Icon */}
-                <div className="absolute top-4 left-4">
-                  <div className={`p-3 rounded-full bg-gradient-to-br ${service.gradient} glow-effect`}>
-                    <service.icon className="w-6 h-6 text-white" />
+          {services.map((service) => {
+            const IconComponent = getIconComponent(service.icon);
+            return (
+              <Card key={service.id} className="bg-black/40 border-gray-800 overflow-hidden hover:border-cyan-400/50 transition-all duration-300 group">
+                {/* Image */}
+                <div className="relative h-64 overflow-hidden">
+                  <img 
+                    src={service.image} 
+                    alt={service.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                  
+                  {/* Icon */}
+                  <div className={`absolute top-4 right-4 p-3 rounded-full bg-gradient-to-r ${service.gradient} shadow-lg`}>
+                    <IconComponent className="w-6 h-6 text-white" />
                   </div>
                 </div>
-              </div>
 
-              <div className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <h3 className="text-xl font-heading font-bold text-foreground">
-                    {service.title}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {service.description}
-                  </p>
+                {/* Content */}
+                <div className="p-6 space-y-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">{service.title}</h3>
+                    <p className="text-gray-300">{service.description}</p>
+                  </div>
+
+                  {/* Features */}
+                  <div className="space-y-2">
+                    {service.features.map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                        <span className="text-sm text-gray-300">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button 
+                    onClick={scrollToContact}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
+                  >
+                    Rezervă Acum
+                  </Button>
                 </div>
-
-                {/* Features */}
-                <div className="space-y-2">
-                  {service.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center space-x-2">
-                      <div className="w-1.5 h-1.5 bg-gradient-to-r from-primary to-accent rounded-full"></div>
-                      <span className="text-sm text-muted-foreground">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <Button 
-                  variant="outline"
-                  className="w-full neon-border hover:glow-effect group-hover:bg-secondary/50 smooth-transition"
-                  onClick={scrollToContact}
-                >
-                  Rezervă pentru {service.title}
-                </Button>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>

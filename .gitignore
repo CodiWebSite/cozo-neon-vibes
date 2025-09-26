@@ -22,3 +22,28 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backup files
+*.tar.gz
+server-backup/
+cozo-*-backup-*.tar.gz
+
+# Server files (these are deployed separately)
+htaccess-coming-soon
+
+# Upload scripts
+upload-*.sh
+
+# WordPress assets (not needed for main site)
+wordpress-assets/
+
+# Documentation files (keep only README.md)
+COMING_SOON_INSTRUCTIONS.md
+GHID_WORDPRESS_ELEMENTOR.md
+INSTRUCTIUNI_SEO_GOOGLE.md
+
+# Environment and config files with sensitive data
+cookies.txt
+
+# Test files
+test_image*.png

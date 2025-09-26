@@ -1,8 +1,39 @@
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Music, Headphones } from 'lucide-react';
 import heroImage from "@/assets/hero-dj-new.jpg";
+import { useTypewriter } from '@/hooks/useTypewriter';
 
 const Hero = () => {
+  const content = {
+    title: 'Creez Experiențe Memorabile',
+    subtitle: 'DJ Profesionist Iași',
+    description: 'DJ profesionist în Iași cu peste 8 ani experiență în evenimente premium. Specializat în DJ nunți, evenimente corporate, petreceri private și cluburi exclusive în Moldova.',
+    primaryButton: 'Rezervă DJ Acum',
+    secondaryButton: 'Vezi Servicii DJ'
+  };
+
+  // Efectul de typing pentru titlu
+  const typewriterWords = [
+    'Experiențe Memorabile',
+    'Momente Magice',
+    'Petreceri Perfecte',
+    'Atmosfera Ideală',
+    'Energie Pură',
+    'Vibrații Perfecte',
+    'Spectacole Unice',
+    'Amintiri de Neuitat'
+  ];
+
+  const { text: typedText, cursor } = useTypewriter({
+    words: typewriterWords,
+    typeSpeed: 120,
+    deleteSpeed: 80,
+    delayBetweenWords: 2500,
+    loop: true,
+    cursor: true
+  });
+
   const scrollToContact = () => {
     const element = document.getElementById('contact');
     if (element) {
@@ -11,11 +42,13 @@ const Hero = () => {
   };
 
   const scrollToServices = () => {
-    const element = document.getElementById('servicii');
+    const element = document.getElementById('services');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
@@ -34,7 +67,7 @@ const Hero = () => {
           {/* Fallback pentru browsere care nu suportă video */}
           <img 
             src={heroImage} 
-            alt="DJ Cozo - Professional DJ Services" 
+            alt="DJ Cozo - DJ profesionist Iași pentru nunți, evenimente corporate și petreceri private" 
             className="w-full h-full object-cover"
           />
         </video>
@@ -56,18 +89,19 @@ const Hero = () => {
           <div className="space-y-6 opacity-0 animate-fade-in-up">
             <div className="inline-flex items-center space-x-2 bg-secondary/20 backdrop-blur-sm border border-primary/20 rounded-full px-4 py-2 neon-border">
               <Play className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">DJ Profesionist</span>
+              <span className="text-sm font-medium text-primary">{content.subtitle}</span>
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight">
               <span className="block">Creez</span>
-              <span className="block gradient-text">Experiențe</span>
-              <span className="block">Memorabile</span>
+              <span className="block gradient-text typewriter-text">
+                {typedText}
+                <span className="typewriter-cursor">{cursor}</span>
+              </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl leading-relaxed">
-              DJ profesionist cu peste 8 ani experiență în evenimente premium. 
-              De la nunți elegante la petreceri corporate și cluburi exclusive.
+              {content.description}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -76,7 +110,7 @@ const Hero = () => {
                 onClick={scrollToContact}
                 className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:scale-105 smooth-transition glow-effect text-lg px-8 py-6"
               >
-                <span className="relative z-10">Rezervă Acum</span>
+                <span className="relative z-10">{content.primaryButton}</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 smooth-transition"></div>
               </Button>
               
@@ -86,7 +120,7 @@ const Hero = () => {
                 onClick={scrollToServices}
                 className="neon-border hover:glow-effect hover:bg-secondary/50 smooth-transition text-lg px-8 py-6"
               >
-                Vezi Servicii
+                {content.secondaryButton}
               </Button>
             </div>
           </div>

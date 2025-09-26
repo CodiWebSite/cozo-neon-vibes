@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://dj-cozo.ro/</loc>
+    <lastmod>2024-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+        <image:loc>https://dj-cozo.ro/hero-bg.jpg</image:loc>
+        <image:title>DJ Cozo - DJ Profesionist Iași</image:title>
+        <image:caption>DJ profesionist pentru nunți, evenimente corporate și petreceri în Iași</image:caption>
+      </image:image>
+    <image:image>
+      <image:loc>https://dj-cozo.ro/assets/dj-portrait.jpg</image:loc>
+      <image:title>DJ Cozo - Portret DJ Profesionist</image:title>
+      <image:caption>DJ Cozo - Artist pasionat cu peste 8 ani experiență</image:caption>
+    </image:image>
+  </url>
+
+  <!-- About Section -->
+  <url>
+    <loc>https://dj-cozo.ro/#about</loc>
+    <lastmod>2024-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Services Section -->
+  <url>
+    <loc>https://dj-cozo.ro/#services</loc>
+    <lastmod>2024-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+        <image:loc>https://dj-cozo.ro/assets/wedding-dj.jpg</image:loc>
+        <image:title>DJ Nunți Iași</image:title>
+        <image:caption>Servicii DJ profesionale pentru nunți în Iași</image:caption>
+      </image:image>
+    <image:image>
+      <image:loc>https://dj-cozo.ro/assets/corporate-event.jpg</image:loc>
+      <image:title>DJ Evenimente Corporate Iași</image:title>
+      <image:caption>DJ pentru evenimente corporate și conferințe în Iași</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://dj-cozo.ro/assets/private-party.jpg</image:loc>
+      <image:title>DJ Petreceri Private Iași</image:title>
+      <image:caption>DJ pentru petreceri private și aniversări în Iași</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://dj-cozo.ro/assets/club-night.jpg</image:loc>
+      <image:title>DJ Club Iași</image:title>
+      <image:caption>DJ pentru cluburi și evenimente nocturne în Iași</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Packages Section -->
+  <url>
+    <loc>https://dj-cozo.ro/#packages</loc>
+    <lastmod>2024-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Gallery Section -->
+  <url>
+    <loc>https://dj-cozo.ro/#gallery</loc>
+    <lastmod>2024-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Contact Section -->
+  <url>
+    <loc>https://dj-cozo.ro/#contact</loc>
+    <lastmod>2024-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Admin Panel -->
+  <url>
+    <loc>https://dj-cozo.ro/admin</loc>
+    <lastmod>2024-09-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+
+</urlset>

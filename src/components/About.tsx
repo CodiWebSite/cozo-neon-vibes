@@ -1,108 +1,85 @@
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Music, Award, Users, Clock } from 'lucide-react';
 import djPortrait from "@/assets/dj-portrait.jpg";
 
 const About = () => {
+  const skills = [
+    "Mixing Profesional",
+    "Echipamente Premium", 
+    "Repertoriu Vast",
+    "Adaptabilitate",
+    "Experiență Live",
+    "Tehnologie Avansată"
+  ];
+
   const stats = [
     {
       icon: Music,
       number: "500+",
-      label: "Evenimente Realizate",
+      label: "Evenimente"
     },
     {
       icon: Award,
       number: "8+",
-      label: "Ani Experiență",
+      label: "Ani Experiență"
     },
     {
       icon: Users,
       number: "10K+",
-      label: "Invitați Fericiți",
+      label: "Oameni Fericiți"
     },
     {
       icon: Clock,
       number: "24/7",
-      label: "Disponibilitate",
-    },
-  ];
-
-  const skills = [
-    "Mixing Profesional",
-    "Echipamente Premium",
-    "Repertoriu Vast",
-    "Adaptabilitate",
-    "Experiență Live",
-    "Muzică Personalizată"
+      label: "Disponibilitate"
+    }
   ];
 
   return (
-    <section id="despre" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
-      <div className="container-custom">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Content */}
+    <section id="about" className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto px-4">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Text Content */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <Badge variant="outline" className="neon-border text-primary">
+              <Badge variant="outline" className="border-cyan-400 text-cyan-400">
                 Despre Mine
               </Badge>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold">
-                <span className="gradient-text">Pasiune</span> și{" "}
-                <span className="gradient-text-secondary">Profesionalism</span>
+              <h2 className="text-4xl lg:text-5xl font-bold text-white">
+                Pasiune și <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Profesionalism</span>
               </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Sunt DJ Cozo, un artist pasionat de muzică cu peste 8 ani de experiență 
-                în industria divertismentului. Specializat în evenimente premium, 
-                aduc energie și atmosferă perfectă la fiecare eveniment.
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Sunt DJ Cozo, un DJ profesionist din Iași cu peste 8 ani de experiență în industria divertismentului. 
+                Activez în Iași și întreaga regiune Moldova, specializat în evenimente premium unde aduc energie și atmosferă perfectă.
+              </p>
+              <p className="text-gray-400 leading-relaxed">
+                De-a lungul carierei mele am avut privilegiul să contribui la crearea de momente magice la sute de evenimente în Iași - 
+                de la DJ nunți romantice și evenimente corporate elegante până la cluburi exclusiviste și petreceri private în Moldova.
               </p>
             </div>
 
-            <div className="space-y-6">
-              <p className="text-muted-foreground">
-                De-a lungul carierei mele am avut privilegiul să contribui la crearea 
-                de momente magice la sute de evenimente - de la nunți romantice și 
-                petreceri corporate elegante până la cluburi exclusiviste și petreceri private.
-              </p>
-              
-              <div className="space-y-3">
-                <h3 className="text-xl font-heading font-semibold text-foreground">
-                  Expertiza Mea:
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {skills.map((skill, index) => (
-                    <div 
-                      key={index}
-                      className="flex items-center space-x-2 opacity-0 animate-fade-in-up"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div className="w-2 h-2 bg-gradient-to-r from-primary to-accent rounded-full"></div>
-                      <span className="text-sm text-muted-foreground">{skill}</span>
-                    </div>
-                  ))}
-                </div>
+            {/* Skills */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-white">Expertiza Mea:</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {skills.map((skill, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"></div>
+                    <span className="text-gray-300">{skill}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 pt-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
-                <Card 
-                  key={index}
-                  className="p-4 bg-secondary/30 border-border/50 hover:neon-border smooth-transition group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-primary/10 rounded-lg group-hover:glow-effect smooth-transition">
-                      <stat.icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="text-xl font-heading font-bold gradient-text">
-                        {stat.number}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {stat.label}
-                      </div>
-                    </div>
-                  </div>
+                <Card key={index} className="bg-black/40 border-gray-800 p-4 text-center hover:border-cyan-400/50 transition-colors">
+                  <stat.icon className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">{stat.number}</div>
+                  <div className="text-sm text-gray-400">{stat.label}</div>
                 </Card>
               ))}
             </div>
@@ -113,15 +90,18 @@ const About = () => {
             <div className="relative overflow-hidden rounded-2xl">
               <img 
                 src={djPortrait} 
-                alt="DJ Cozo - Professional DJ Portrait" 
-                className="w-full h-[600px] object-cover hover:scale-105 smooth-transition"
+                alt="DJ Cozo - DJ profesionist cu experiență în Iași, specializat în nunți și evenimente" 
+                className="w-full h-[600px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             </div>
             
             {/* Floating Element */}
-            <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full glow-effect animate-float flex items-center justify-center">
-              <Music className="w-8 h-8 text-background" />
+            <div className="absolute -bottom-6 -right-6 bg-gradient-to-r from-cyan-400 to-purple-400 p-6 rounded-2xl shadow-2xl">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-black">DJ COZO</div>
+                <div className="text-sm text-black/80">Professional DJ</div>
+              </div>
             </div>
           </div>
         </div>
