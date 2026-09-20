@@ -161,6 +161,16 @@ const Gallery = () => {
                             decoding="async"
                             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
+                        ) : item.displayUrl && !isEmbed(item.video_url) ? (
+                          // fallback: primul cadru al clipului, pentru video-urile fără miniatură salvată
+                          <video
+                            src={`${item.displayUrl}#t=0.5`}
+                            preload="metadata"
+                            muted
+                            playsInline
+                            tabIndex={-1}
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500"
+                          />
                         ) : null}
                         <div className="relative bg-neon-cyan/20 rounded-full p-4 backdrop-blur-sm">
                           <Play className="w-12 h-12 text-neon-cyan fill-current" />
