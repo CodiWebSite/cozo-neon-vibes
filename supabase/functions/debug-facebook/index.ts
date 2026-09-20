@@ -23,6 +23,9 @@ Deno.serve(async (req) => {
     accounts: await get("me/accounts?fields=id,name&limit=25"),
     page: await get(`${pageId}?fields=id,name,rating_count,overall_star_rating`),
     ratings: await get(`${pageId}/ratings?fields=created_time,rating,review_text&limit=3`),
+    ratingsFull: await get(
+      `${pageId}/ratings?fields=${encodeURIComponent("created_time,rating,recommendation_type,review_text,open_graph_story{id},reviewer{id,name,picture{url}}")}&limit=3`,
+    ),
   };
 
   return new Response(JSON.stringify(out, null, 2), {
