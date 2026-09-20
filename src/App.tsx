@@ -15,6 +15,7 @@ const SimpleTest = lazy(() => import("./pages/SimpleTest"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminInvite = lazy(() => import("./pages/AdminInvite"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
