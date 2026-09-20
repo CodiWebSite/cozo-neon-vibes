@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, ThumbsUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 interface TestimonialRow {
   id: string;
@@ -83,6 +84,7 @@ const TestimonialCard = ({ item }: { item: TestimonialRow }) => {
 };
 
 const Testimonials = () => {
+  const { t } = useSiteContent();
   const [showAll, setShowAll] = useState(false);
 
   const { data } = useQuery({

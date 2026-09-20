@@ -6,8 +6,10 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X, ChevronLeft, ChevronRight, Play, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { resolveGalleryItems, type GalleryRow } from '@/lib/galleryUrls';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Gallery = () => {
+  const { t } = useSiteContent();
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
