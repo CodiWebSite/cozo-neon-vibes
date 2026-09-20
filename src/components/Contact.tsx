@@ -17,19 +17,24 @@ import {
   Facebook,
   Instagram
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  
-  // Date statice pentru contact
+  const { t } = useSiteContent();
+
   const contactData = {
-    phone: "+40 749 800 325",
-    email: "contact@dj-cozo.ro",
+    phone: t('contact_phone', '+40 749 800 325'),
+    email: t('contact_email', 'contact@dj-cozo.ro'),
+    whatsapp: t('contact_whatsapp', '40749800325'),
+    location: t('contact_location', 'Iași, România'),
     instagram: "https://www.instagram.com/djcozo/",
     facebook: "https://www.facebook.com/DJDavidCozo",
     tiktok: "https://www.tiktok.com/@davidcozo"
   };
+  
   
   const [formData, setFormData] = useState({
     name: '',
@@ -52,30 +57,29 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/send-email.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      const { error } = await supabase.from('contact_messages').insert({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        event_type: formData.event_type || null,
+        event_date: formData.event_date || null,
+        message: formData.message,
       });
 
-      if (response.ok) {
-        toast({
-          title: "Mesaj trimis cu succes!",
-          description: "Îți voi răspunde în cel mai scurt timp posibil.",
-        });
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          event_type: '',
-          event_date: '',
-          message: ''
-        });
-      } else {
-        throw new Error('Eroare la trimiterea mesajului');
-      }
+      if (error) throw error;
+
+      toast({
+        title: "Mesaj trimis cu succes!",
+        description: "Îți voi răspunde în cel mai scurt timp posibil.",
+      });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        event_type: '',
+        event_date: '',
+        message: ''
+      });
     } catch (error) {
       toast({
         title: "Eroare la trimiterea mesajului",
