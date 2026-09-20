@@ -3,14 +3,20 @@ import { Button } from '@/components/ui/button';
 import { Play, Music, Headphones } from 'lucide-react';
 import heroImage from "@/assets/hero-dj-new.jpg";
 import { useTypewriter } from '@/hooks/useTypewriter';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Hero = () => {
+  const { t } = useSiteContent();
+
   const content = {
     title: 'Creez Experiențe Memorabile',
-    subtitle: 'DJ Profesionist Iași',
-    description: 'DJ profesionist în Iași cu peste 12 ani experiență în evenimente premium. Specializat în DJ nunți, evenimente corporate, petreceri private și cluburi exclusive în regiunea Moldovei.',
-    primaryButton: 'Rezervă DJ Acum',
-    secondaryButton: 'Vezi Servicii DJ'
+    subtitle: t('hero_badge', 'DJ Profesionist Iași'),
+    description: t(
+      'hero_description',
+      'DJ profesionist în Iași cu peste 12 ani experiență în evenimente premium. Specializat în DJ nunți, evenimente corporate, petreceri private și cluburi exclusive în regiunea Moldovei.'
+    ),
+    primaryButton: t('hero_primary_button', 'Rezervă DJ Acum'),
+    secondaryButton: t('hero_secondary_button', 'Vezi Servicii DJ')
   };
 
   // Efectul de typing pentru titlu

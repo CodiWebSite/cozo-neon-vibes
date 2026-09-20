@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789901284578,
+      "tag": "0000_admin_cms_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789901328840,
+      "tag": "0001_storage_policies_and_admin_bootstrap",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789901615902,
+      "tag": "0002_tighten_function_grants",
+      "breakpoints": true
+    }
+  ]
 }

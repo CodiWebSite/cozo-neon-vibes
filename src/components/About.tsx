@@ -3,8 +3,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Music, Award, Users, Clock } from 'lucide-react';
 import djPortrait from "@/assets/dj-portrait.jpg";
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const About = () => {
+  const { t } = useSiteContent();
+
   const skills = [
     "Mixing Profesional",
     "Echipamente Premium", 
@@ -17,17 +20,17 @@ const About = () => {
   const stats = [
     {
       icon: Music,
-      number: "500+",
+      number: t('about_stat_events', '500+'),
       label: "Evenimente"
     },
     {
       icon: Award,
-      number: "12+",
+      number: t('about_stat_years', '12+'),
       label: "Ani Experiență"
     },
     {
       icon: Users,
-      number: "10K+",
+      number: t('about_stat_people', '10K+'),
       label: "Oameni Fericiți"
     },
     {
@@ -51,12 +54,10 @@ const About = () => {
                 Pasiune și <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Profesionalism</span>
               </h2>
               <p className="text-lg text-gray-300 leading-relaxed">
-                Sunt DJ Cozo, un DJ profesionist din Iași cu peste 12 ani de experiență în industria divertismentului. 
-                Activez în Iași și în întreaga regiune a Moldovei, specializat în evenimente premium, unde aduc energia și creez o atmosferă perfectă.
+                {t('about_paragraph_1', 'Sunt DJ Cozo, un DJ profesionist din Iași cu peste 12 ani de experiență în industria divertismentului. Activez în Iași și în întreaga regiune a Moldovei, specializat în evenimente premium, unde aduc energia și creez o atmosferă perfectă.')}
               </p>
               <p className="text-gray-400 leading-relaxed">
-                De-a lungul carierei mele am avut privilegiul să contribui la crearea de momente magice la sute de evenimente din Iași și nu numai - 
-                de la DJ nunți romantice și evenimente corporate elegante până la cluburi exclusiviste și petreceri private în regiunea Moldovei.
+                {t('about_paragraph_2', 'De-a lungul carierei mele am avut privilegiul să contribui la crearea de momente magice la sute de evenimente din Iași și nu numai - de la DJ nunți romantice și evenimente corporate elegante până la cluburi exclusiviste și petreceri private în regiunea Moldovei.')}
               </p>
             </div>
 
