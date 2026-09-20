@@ -656,6 +656,7 @@ const AdminPanel = () => {
     }
   );
   const pendingCount = queue.filter((i) => i.status === 'pending' || i.status === 'error').length;
+  const failedCount = queue.filter((i) => i.status === 'error').length;
 
 
 
