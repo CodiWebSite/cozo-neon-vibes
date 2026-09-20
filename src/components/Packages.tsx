@@ -74,8 +74,14 @@ const DEFAULT_PACKAGES: PackageItem[] = [
 ];
 
 const Packages = () => {
-  const { t } = useSiteContent();
-  const packages = DEFAULT_PACKAGES;
+  const { t, tl } = useSiteContent();
+  const packages: PackageItem[] = DEFAULT_PACKAGES.map((pkg, i) => ({
+    ...pkg,
+    name: t(`package_${i + 1}_name`, pkg.name),
+    duration: t(`package_${i + 1}_duration`, pkg.duration),
+    description: t(`package_${i + 1}_description`, pkg.description),
+    features: tl(`package_${i + 1}_features`, pkg.features),
+  }));
 
   // Mapare iconuri
   const iconMap: { [key: string]: React.ComponentType<any> } = {
@@ -99,14 +105,13 @@ const Packages = () => {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge variant="outline" className="neon-border text-primary mb-4">
-            Pachete Disponibile
+            {t('packages_badge', 'Pachete Disponibile')}
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6">
-            Alege <span className="gradient-text">Pachetul</span> Perfect
+            {t('packages_title', 'Alege')} <span className="gradient-text">{t('packages_title_accent', 'Pachetul')}</span> {t('packages_title_suffix', 'Perfect')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Pachete complete adaptate pentru orice tip de eveniment. 
-            Servicii profesionale cu echipament, transport și setup inclus.
+            {t('packages_subtitle', 'Pachete complete adaptate pentru orice tip de eveniment. Servicii profesionale cu echipament, transport și setup inclus.')}
           </p>
         </div>
 
@@ -128,7 +133,7 @@ const Packages = () => {
                   {pkg.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                       <Badge className={`bg-gradient-to-r ${pkg.gradient} text-white glow-effect px-6 py-2 text-sm font-semibold whitespace-nowrap shadow-lg`}>
-                        Cel Mai Popular
+                        {t('packages_popular_badge', 'Cel Mai Popular')}
                       </Badge>
                     </div>
                   )}
@@ -182,7 +187,9 @@ const Packages = () => {
                     } smooth-transition`}
                     onClick={scrollToContact}
                   >
-                    {pkg.popular ? 'Rezervă Acum' : 'Selectează Pachetul'}
+                    {pkg.popular
+                      ? t('packages_button_popular', 'Rezervă Acum')
+                      : t('packages_button', 'Selectează Pachetul')}
                   </Button>
                 </div>
               </Card>
@@ -197,7 +204,7 @@ const Packages = () => {
             {t('packages_note', 'Toate pachetele includ transport gratuit în orașul Iași.')}
           </p>
           <Button variant="outline" className="neon-border hover:glow-effect" onClick={scrollToContact}>
-            Solicită Ofertă Personalizată
+            {t('packages_cta_button', 'Solicită Ofertă Personalizată')}
           </Button>
         </div>
       </div>

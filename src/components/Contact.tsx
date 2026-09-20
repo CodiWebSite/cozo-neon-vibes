@@ -36,9 +36,9 @@ const Contact = () => {
     email: t('contact_email', 'contact@dj-cozo.ro'),
     whatsapp: t('contact_whatsapp', '40749800325'),
     location: t('contact_location', 'Iași, România'),
-    instagram: "https://www.instagram.com/djcozo/",
-    facebook: "https://www.facebook.com/DJDavidCozo",
-    tiktok: "https://www.tiktok.com/@davidcozo"
+    instagram: t('contact_instagram_url', 'https://www.instagram.com/djcozo/'),
+    facebook: t('contact_facebook_url', 'https://www.facebook.com/DJDavidCozo'),
+    tiktok: t('contact_tiktok_url', 'https://www.tiktok.com/@davidcozo')
   };
   
   
@@ -210,7 +210,7 @@ const Contact = () => {
     {
       icon: Clock,
       title: "Program",
-      detail: "24/7 Disponibil",
+      detail: t('contact_schedule', '24/7 Disponibil'),
       action: null
     }
   ];
@@ -223,14 +223,13 @@ const Contact = () => {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge variant="outline" className="neon-border text-primary mb-4">
-            Contactează-mă
+            {t('contact_badge', 'Contactează-mă')}
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6">
-            Hai să Creăm <span className="gradient-text">Magie</span> Împreună
+            {t('contact_title', 'Hai să Creăm')} <span className="gradient-text">{t('contact_title_accent', 'Magie')}</span> {t('contact_title_suffix', 'Împreună')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Sunt gata să transform evenimentul tău într-o experiență de neuitat. 
-            Contactează-mă pentru mai multe informații!
+            {t('contact_subtitle', 'Sunt gata să transform evenimentul tău într-o experiență de neuitat. Contactează-mă pentru mai multe informații!')}
           </p>
         </div>
 
@@ -240,10 +239,10 @@ const Contact = () => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <h3 className="text-xl font-heading font-bold text-foreground">
-                  Trimite-mi un mesaj
+                  {t('contact_form_title', 'Trimite-mi un mesaj')}
                 </h3>
                 <p className="text-muted-foreground">
-                  Completează formularul și îți voi răspunde în maxim 2 ore
+                  {t('contact_form_subtitle', 'Completează formularul și îți voi răspunde în maxim 2 ore')}
                 </p>
               </div>
 
@@ -383,10 +382,10 @@ const Contact = () => {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <h3 className="text-xl font-heading font-bold text-foreground">
-                    Informații de Contact
+                    {t('contact_info_title', 'Informații de Contact')}
                   </h3>
                   <p className="text-muted-foreground">
-                    Sunt mereu disponibil pentru o discuție despre evenimentul tău
+                    {t('contact_info_subtitle', 'Sunt mereu disponibil pentru o discuție despre evenimentul tău')}
                   </p>
                 </div>
 
@@ -420,17 +419,17 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-heading font-bold text-foreground mb-2">
-                    Contact Rapid WhatsApp
+                    {t('contact_whatsapp_title', 'Contact Rapid WhatsApp')}
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    Pentru răspuns imediat, scrie-mi pe WhatsApp
+                    {t('contact_whatsapp_text', 'Pentru răspuns imediat, scrie-mi pe WhatsApp')}
                   </p>
                   <Button
                     className="bg-green-600 hover:bg-green-700 text-white hover:scale-105 smooth-transition glow-effect"
                     onClick={() => window.open(`https://wa.me/${contactData.whatsapp}?text=${whatsappMessage}`, '_blank')}
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    Scrie pe WhatsApp
+                    {t('contact_whatsapp_button', 'Scrie pe WhatsApp')}
                   </Button>
                 </div>
               </div>
@@ -444,10 +443,10 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-heading font-bold text-foreground mb-2">
-                    Urmărește-mă
+                    {t('contact_social_title', 'Urmărește-mă')}
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    Conectează-te cu mine pe rețelele sociale
+                    {t('contact_social_text', 'Conectează-te cu mine pe rețelele sociale')}
                   </p>
                   <div className="flex gap-4 justify-center mt-6">
                     <a href={contactData.facebook} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">

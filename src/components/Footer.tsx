@@ -1,8 +1,10 @@
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logoImg from "@/assets/dj-cozo-logo.png";
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Footer = () => {
+  const { t, tl } = useSiteContent();
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -21,14 +23,14 @@ const Footer = () => {
     { id: 'contact', label: 'Contact' },
   ];
 
-  const services = [
+  const services = tl('footer_services', [
     "DJ Nunți",
-    "Evenimente Corporate", 
+    "Evenimente Corporate",
     "Cluburi & Baruri",
     "Petreceri Private",
     "Consultanță Muzicală",
     "Echipament Premium"
-  ];
+  ]);
 
   return (
     <footer className="bg-gradient-to-b from-background to-secondary/30 border-t border-border/50">
@@ -42,28 +44,27 @@ const Footer = () => {
             </div>
             
             <p className="text-muted-foreground leading-relaxed">
-              DJ profesionist cu pasiune pentru muzică și atmosferă perfectă. 
-              Creez experiențe memorabile la fiecare eveniment.
+              {t('footer_description', 'DJ profesionist cu pasiune pentru muzică și atmosferă perfectă. Creez experiențe memorabile la fiecare eveniment.')}
             </p>
 
             <div className="space-y-2">
               <a 
-                href="tel:+40749800325" 
+                href={`tel:${t('contact_phone', '+40 749 800 325').replace(/\s+/g, '')}`} 
                 className="flex items-center space-x-2 text-muted-foreground hover:text-primary smooth-transition"
               >
                 <Phone className="w-4 h-4" />
-                <span>+40 749 800 325</span>
+                <span>{t('contact_phone', '+40 749 800 325')}</span>
               </a>
               <a 
-                href="mailto:contact@dj-cozo.ro" 
+                href={`mailto:${t('contact_email', 'contact@dj-cozo.ro')}`} 
                 className="flex items-center space-x-2 text-muted-foreground hover:text-primary smooth-transition"
               >
                 <Mail className="w-4 h-4" />
-                <span>contact@dj-cozo.ro</span>
+                <span>{t('contact_email', 'contact@dj-cozo.ro')}</span>
               </a>
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
-                <span>Iași, România</span>
+                <span>{t('contact_location', 'Iași, România')}</span>
               </div>
             </div>
           </div>
@@ -71,7 +72,7 @@ const Footer = () => {
           {/* Navigation Column */}
           <div className="space-y-6">
             <h3 className="text-lg font-heading font-semibold text-foreground">
-              Navigare Rapidă
+              {t('footer_nav_title', 'Navigare Rapidă')}
             </h3>
             <ul className="space-y-3">
               {navLinks.map((link) => (
@@ -90,7 +91,7 @@ const Footer = () => {
           {/* Services Column */}
           <div className="space-y-6">
             <h3 className="text-lg font-heading font-semibold text-foreground">
-              Servicii Oferite
+              {t('footer_services_title', 'Servicii Oferite')}
             </h3>
             <ul className="space-y-3">
               {services.map((service, index) => (
@@ -107,17 +108,17 @@ const Footer = () => {
           {/* Contact Column */}
           <div className="space-y-6">
             <h3 className="text-lg font-heading font-semibold text-foreground">
-              Contactează-mă
+              {t('footer_contact_title', 'Contactează-mă')}
             </h3>
             
             <div className="space-y-4">
               <p className="text-muted-foreground text-sm">
-                Disponibil 24/7 pentru consultații și rezervări. Răspund rapid la toate întrebările.
+                {t('footer_contact_text', 'Disponibil 24/7 pentru consultații și rezervări. Răspund rapid la toate întrebările.')}
               </p>
               
               <div className="space-y-2">
                 <a
-                  href={`https://wa.me/40749800325?text=${encodeURIComponent("Salut DJ Cozo! Sunt interesat de serviciile tale.")}`}
+                  href={`https://wa.me/${t('contact_whatsapp', '40749800325')}?text=${encodeURIComponent("Salut DJ Cozo! Sunt interesat de serviciile tale.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg smooth-transition text-sm"
@@ -132,7 +133,7 @@ const Footer = () => {
                   onClick={() => scrollToSection('contact')}
                   className="block w-full text-left bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-lg smooth-transition text-sm border border-primary/30"
                 >
-                  Formular Contact
+                  {t('footer_contact_button', 'Formular Contact')}
                 </button>
               </div>
             </div>
@@ -143,7 +144,7 @@ const Footer = () => {
         <div className="py-6 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 text-muted-foreground text-sm">
-              <span>© {currentYear} DJ Cozo. Toate drepturile rezervate.</span>
+              <span>© {currentYear} {t('footer_copyright', 'DJ Cozo. Toate drepturile rezervate.')}</span>
               <div className="flex items-center space-x-4">
                 <Link 
                   to="/politici" 
