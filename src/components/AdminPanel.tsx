@@ -97,6 +97,109 @@ const AdminPanel = () => {
   const removeFromQueue = (id: string) =>
     setQueue((prev) => prev.filter((item) => item.id !== id));
 
+  const friendlyError = (error: unknown) => {
+    const raw = error instanceof Error ? error.message : 'Eroare';
+    if (/exceeded the maximum allowed size|payload too large|413|prea mare/i.test(raw)) {
+      return 'Fișierul este prea mare (maxim 500 MB). Comprimă clipul și încearcă din nou.';
+    }
+    if (/already exists|duplicate/i.test(raw)) return 'Fișierul există deja în galerie.';
+    if (/mime type|not supported/i.test(raw)) return 'Formatul acestui fișier nu este acceptat.';
+    if (/network|failed to fetch|conexiune/i.test(raw)) {
+      return 'Conexiune întreruptă. Reîncerc automat...';
+    }
+    return raw;
+  };
+
+  const uploadOne = async (
+    item: QueueItem,
+    setItem: (id: string, patch: Partial<QueueItem>) => void,
+  ) => {
+    const isVideo = item.file.type.startsWith('video/');
+    const base = crypto.randomUUID();
+    const title = item.file.name.replace(/\.[^.]+$/, '');
+
+    if (isVideo) {
+      const ext = item.file.name.split('.').pop() ?? 'mp4';
+      const path = `${base}.${ext}`;
+
+      let poster: { thumb: Blob; width: number; height: number } | null = null;
+      try {
+        poster = await prepareVideoPoster(item.file);
+      } catch {
+        poster = null;
+      }
+
+      await uploadWithProgress({
+        bucket: 'gallery',
+        path,
+        body: item.file,
+        contentType: item.file.type,
+        onProgress: (p) => setItem(item.id, { progress: Math.round(p * 0.9) }),
+      });
+
+      let thumbPath: string | null = null;
+      if (poster) {
+        thumbPath = `${base}-thumb.webp`;
+        try {
+          await uploadWithProgress({
+            bucket: 'gallery',
+            path: thumbPath,
+            body: poster.thumb,
+            contentType: 'image/webp',
+          });
+        } catch {
+          thumbPath = null;
+        }
+      }
+
+      setItem(item.id, { progress: 95 });
+      const { error: dbError } = await supabase.from('gallery_items').insert({
+        title,
+        category,
+        type: 'video',
+        video_url: path,
+        thumb_path: thumbPath,
+        width: poster?.width ?? null,
+        height: poster?.height ?? null,
+      });
+      if (dbError) throw dbError;
+      return;
+    }
+
+    const prepared = await prepareImage(item.file);
+    setItem(item.id, { progress: 10 });
+
+    const fullPath = `${base}.webp`;
+    const thumbPath = `${base}-thumb.webp`;
+
+    await uploadWithProgress({
+      bucket: 'gallery',
+      path: fullPath,
+      body: prepared.full,
+      contentType: 'image/webp',
+      onProgress: (p) => setItem(item.id, { progress: 10 + Math.round(p * 0.7) }),
+    });
+
+    await uploadWithProgress({
+      bucket: 'gallery',
+      path: thumbPath,
+      body: prepared.thumb,
+      contentType: 'image/webp',
+      onProgress: (p) => setItem(item.id, { progress: 80 + Math.round(p * 0.15) }),
+    });
+
+    const { error: dbError } = await supabase.from('gallery_items').insert({
+      title,
+      category,
+      type: 'image',
+      src: fullPath,
+      thumb_path: thumbPath,
+      width: prepared.width,
+      height: prepared.height,
+    });
+    if (dbError) throw dbError;
+  };
+
   const uploadAll = async () => {
     const pending = queue.filter((item) => item.status === 'pending' || item.status === 'error');
     if (pending.length === 0) return;
@@ -106,106 +209,47 @@ const AdminPanel = () => {
       setQueue((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
 
     let ok = 0;
+    let failed = 0;
     for (const item of pending) {
-      setItem(item.id, { status: 'working', progress: 10, error: undefined });
+      setItem(item.id, { status: 'working', progress: 0, error: undefined, attempt: 1 });
       try {
-        const isVideo = item.file.type.startsWith('video/');
-        const base = crypto.randomUUID();
-
-        if (isVideo) {
-          const ext = item.file.name.split('.').pop() ?? 'mp4';
-          const path = `${base}.${ext}`;
-
-          let poster: { thumb: Blob; width: number; height: number } | null = null;
-          try {
-            poster = await prepareVideoPoster(item.file);
-          } catch {
-            poster = null;
-          }
-
-          setItem(item.id, { progress: 40 });
-          const { error } = await supabase.storage.from('gallery').upload(path, item.file, {
-            cacheControl: '31536000',
-            contentType: item.file.type,
+        await withRetry(async (attempt) => {
+          setItem(item.id, {
+            status: 'working',
+            attempt,
+            progress: 0,
+            error: attempt > 1 ? 'Reîncerc automat...' : undefined,
           });
-          if (error) throw error;
-
-          let thumbPath: string | null = null;
-          if (poster) {
-            thumbPath = `${base}-thumb.webp`;
-            const upThumb = await supabase.storage.from('gallery').upload(thumbPath, poster.thumb, {
-              cacheControl: '31536000',
-              contentType: 'image/webp',
-            });
-            if (upThumb.error) thumbPath = null;
-          }
-
-          setItem(item.id, { progress: 80 });
-          const { error: dbError } = await supabase.from('gallery_items').insert({
-            title: item.file.name.replace(/\.[^.]+$/, ''),
-            category,
-            type: 'video',
-            video_url: path,
-            thumb_path: thumbPath,
-            width: poster?.width ?? null,
-            height: poster?.height ?? null,
-          });
-          if (dbError) throw dbError;
-        } else {
-          setItem(item.id, { progress: 25 });
-          const prepared = await prepareImage(item.file);
-          setItem(item.id, { progress: 45 });
-
-          const fullPath = `${base}.webp`;
-          const thumbPath = `${base}-thumb.webp`;
-
-          const up1 = await supabase.storage.from('gallery').upload(fullPath, prepared.full, {
-            cacheControl: '31536000',
-            contentType: 'image/webp',
-          });
-          if (up1.error) throw up1.error;
-          setItem(item.id, { progress: 70 });
-
-          const up2 = await supabase.storage.from('gallery').upload(thumbPath, prepared.thumb, {
-            cacheControl: '31536000',
-            contentType: 'image/webp',
-          });
-          if (up2.error) throw up2.error;
-          setItem(item.id, { progress: 90 });
-
-          const { error: dbError } = await supabase.from('gallery_items').insert({
-            title: item.file.name.replace(/\.[^.]+$/, ''),
-            category,
-            type: 'image',
-            src: fullPath,
-            thumb_path: thumbPath,
-            width: prepared.width,
-            height: prepared.height,
-          });
-          if (dbError) throw dbError;
-        }
-
-        setItem(item.id, { status: 'done', progress: 100 });
+          await uploadOne(item, setItem);
+        }, 3);
+        setItem(item.id, { status: 'done', progress: 100, error: undefined });
         ok++;
       } catch (error) {
-        const raw = error instanceof Error ? error.message : 'Eroare';
-        let friendly = raw;
-        if (/exceeded the maximum allowed size|payload too large|413/i.test(raw)) {
-          friendly = 'Fișierul este prea mare (maxim 500 MB). Comprimă clipul și încearcă din nou.';
-        } else if (/already exists|duplicate/i.test(raw)) {
-          friendly = 'Fișierul există deja în galerie.';
-        } else if (/mime type|not supported/i.test(raw)) {
-          friendly = 'Formatul acestui fișier nu este acceptat.';
-        } else if (/network|failed to fetch/i.test(raw)) {
-          friendly = 'Conexiune întreruptă în timpul încărcării. Încearcă din nou.';
-        }
-        setItem(item.id, { status: 'error', progress: 0, error: friendly });
+        setItem(item.id, { status: 'error', progress: 0, error: friendlyError(error) });
+        failed++;
       }
     }
 
     setUploading(false);
     refreshGallery();
     if (ok > 0) toast({ title: `${ok} fișiere adăugate în galerie` });
+    if (failed > 0) {
+      toast({
+        title: `${failed} fișiere nu au putut fi încărcate`,
+        description: 'Apasă „Reîncearcă eșuate" ca să încerci din nou doar pentru ele.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const retryFailed = async () => {
+    setQueue((prev) =>
+      prev.map((item) =>
+        item.status === 'error' ? { ...item, status: 'pending', error: undefined, progress: 0 } : item,
+      ),
+    );
+    await new Promise((r) => setTimeout(r, 50));
+    uploadAll();
   };
 
   const clearFinished = () =>
