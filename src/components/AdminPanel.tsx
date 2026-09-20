@@ -211,7 +211,7 @@ const AdminPanel = () => {
     },
   });
 
-  const updateGalleryItem = async (id: string, patch: Record<string, unknown>) => {
+  const updateGalleryItem = async (id: string, patch: { title?: string; category?: string }) => {
     const { error } = await supabase.from('gallery_items').update(patch).eq('id', id);
     if (error) {
       toast({ title: 'Nu am putut salva', description: error.message, variant: 'destructive' });
