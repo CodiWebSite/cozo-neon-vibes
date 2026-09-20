@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { resolveGalleryItems, type GalleryRow } from '@/lib/galleryUrls';
 import { prepareImage, prepareVideoPoster, formatBytes } from '@/lib/imageUpload';
+import { uploadWithProgress, withRetry } from '@/lib/uploadWithProgress';
+import SortableGalleryGrid from '@/components/admin/SortableGalleryGrid';
 import {
   Loader2, Trash2, Upload, LogOut, Save, Mail, ExternalLink,
   ImagePlus, Link2, RefreshCw, Star, Eye, EyeOff, Plus, CheckCircle2, XCircle,
@@ -53,6 +55,7 @@ interface QueueItem {
   status: QueueStatus;
   progress: number;
   error?: string;
+  attempt?: number;
 }
 
 const CATEGORIES = ['nunti', 'corporate', 'club', 'private', 'general'];
@@ -97,6 +100,109 @@ const AdminPanel = () => {
   const removeFromQueue = (id: string) =>
     setQueue((prev) => prev.filter((item) => item.id !== id));
 
+  const friendlyError = (error: unknown) => {
+    const raw = error instanceof Error ? error.message : 'Eroare';
+    if (/exceeded the maximum allowed size|payload too large|413|prea mare/i.test(raw)) {
+      return 'Fișierul este prea mare (maxim 500 MB). Comprimă clipul și încearcă din nou.';
+    }
+    if (/already exists|duplicate/i.test(raw)) return 'Fișierul există deja în galerie.';
+    if (/mime type|not supported/i.test(raw)) return 'Formatul acestui fișier nu este acceptat.';
+    if (/network|failed to fetch|conexiune/i.test(raw)) {
+      return 'Conexiune întreruptă. Reîncerc automat...';
+    }
+    return raw;
+  };
+
+  const uploadOne = async (
+    item: QueueItem,
+    setItem: (id: string, patch: Partial<QueueItem>) => void,
+  ) => {
+    const isVideo = item.file.type.startsWith('video/');
+    const base = crypto.randomUUID();
+    const title = item.file.name.replace(/\.[^.]+$/, '');
+
+    if (isVideo) {
+      const ext = item.file.name.split('.').pop() ?? 'mp4';
+      const path = `${base}.${ext}`;
+
+      let poster: { thumb: Blob; width: number; height: number } | null = null;
+      try {
+        poster = await prepareVideoPoster(item.file);
+      } catch {
+        poster = null;
+      }
+
+      await uploadWithProgress({
+        bucket: 'gallery',
+        path,
+        body: item.file,
+        contentType: item.file.type,
+        onProgress: (p) => setItem(item.id, { progress: Math.round(p * 0.9) }),
+      });
+
+      let thumbPath: string | null = null;
+      if (poster) {
+        thumbPath = `${base}-thumb.webp`;
+        try {
+          await uploadWithProgress({
+            bucket: 'gallery',
+            path: thumbPath,
+            body: poster.thumb,
+            contentType: 'image/webp',
+          });
+        } catch {
+          thumbPath = null;
+        }
+      }
+
+      setItem(item.id, { progress: 95 });
+      const { error: dbError } = await supabase.from('gallery_items').insert({
+        title,
+        category,
+        type: 'video',
+        video_url: path,
+        thumb_path: thumbPath,
+        width: poster?.width ?? null,
+        height: poster?.height ?? null,
+      });
+      if (dbError) throw dbError;
+      return;
+    }
+
+    const prepared = await prepareImage(item.file);
+    setItem(item.id, { progress: 10 });
+
+    const fullPath = `${base}.webp`;
+    const thumbPath = `${base}-thumb.webp`;
+
+    await uploadWithProgress({
+      bucket: 'gallery',
+      path: fullPath,
+      body: prepared.full,
+      contentType: 'image/webp',
+      onProgress: (p) => setItem(item.id, { progress: 10 + Math.round(p * 0.7) }),
+    });
+
+    await uploadWithProgress({
+      bucket: 'gallery',
+      path: thumbPath,
+      body: prepared.thumb,
+      contentType: 'image/webp',
+      onProgress: (p) => setItem(item.id, { progress: 80 + Math.round(p * 0.15) }),
+    });
+
+    const { error: dbError } = await supabase.from('gallery_items').insert({
+      title,
+      category,
+      type: 'image',
+      src: fullPath,
+      thumb_path: thumbPath,
+      width: prepared.width,
+      height: prepared.height,
+    });
+    if (dbError) throw dbError;
+  };
+
   const uploadAll = async () => {
     const pending = queue.filter((item) => item.status === 'pending' || item.status === 'error');
     if (pending.length === 0) return;
@@ -106,106 +212,47 @@ const AdminPanel = () => {
       setQueue((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
 
     let ok = 0;
+    let failed = 0;
     for (const item of pending) {
-      setItem(item.id, { status: 'working', progress: 10, error: undefined });
+      setItem(item.id, { status: 'working', progress: 0, error: undefined, attempt: 1 });
       try {
-        const isVideo = item.file.type.startsWith('video/');
-        const base = crypto.randomUUID();
-
-        if (isVideo) {
-          const ext = item.file.name.split('.').pop() ?? 'mp4';
-          const path = `${base}.${ext}`;
-
-          let poster: { thumb: Blob; width: number; height: number } | null = null;
-          try {
-            poster = await prepareVideoPoster(item.file);
-          } catch {
-            poster = null;
-          }
-
-          setItem(item.id, { progress: 40 });
-          const { error } = await supabase.storage.from('gallery').upload(path, item.file, {
-            cacheControl: '31536000',
-            contentType: item.file.type,
+        await withRetry(async (attempt) => {
+          setItem(item.id, {
+            status: 'working',
+            attempt,
+            progress: 0,
+            error: attempt > 1 ? 'Reîncerc automat...' : undefined,
           });
-          if (error) throw error;
-
-          let thumbPath: string | null = null;
-          if (poster) {
-            thumbPath = `${base}-thumb.webp`;
-            const upThumb = await supabase.storage.from('gallery').upload(thumbPath, poster.thumb, {
-              cacheControl: '31536000',
-              contentType: 'image/webp',
-            });
-            if (upThumb.error) thumbPath = null;
-          }
-
-          setItem(item.id, { progress: 80 });
-          const { error: dbError } = await supabase.from('gallery_items').insert({
-            title: item.file.name.replace(/\.[^.]+$/, ''),
-            category,
-            type: 'video',
-            video_url: path,
-            thumb_path: thumbPath,
-            width: poster?.width ?? null,
-            height: poster?.height ?? null,
-          });
-          if (dbError) throw dbError;
-        } else {
-          setItem(item.id, { progress: 25 });
-          const prepared = await prepareImage(item.file);
-          setItem(item.id, { progress: 45 });
-
-          const fullPath = `${base}.webp`;
-          const thumbPath = `${base}-thumb.webp`;
-
-          const up1 = await supabase.storage.from('gallery').upload(fullPath, prepared.full, {
-            cacheControl: '31536000',
-            contentType: 'image/webp',
-          });
-          if (up1.error) throw up1.error;
-          setItem(item.id, { progress: 70 });
-
-          const up2 = await supabase.storage.from('gallery').upload(thumbPath, prepared.thumb, {
-            cacheControl: '31536000',
-            contentType: 'image/webp',
-          });
-          if (up2.error) throw up2.error;
-          setItem(item.id, { progress: 90 });
-
-          const { error: dbError } = await supabase.from('gallery_items').insert({
-            title: item.file.name.replace(/\.[^.]+$/, ''),
-            category,
-            type: 'image',
-            src: fullPath,
-            thumb_path: thumbPath,
-            width: prepared.width,
-            height: prepared.height,
-          });
-          if (dbError) throw dbError;
-        }
-
-        setItem(item.id, { status: 'done', progress: 100 });
+          await uploadOne(item, setItem);
+        }, 3);
+        setItem(item.id, { status: 'done', progress: 100, error: undefined });
         ok++;
       } catch (error) {
-        const raw = error instanceof Error ? error.message : 'Eroare';
-        let friendly = raw;
-        if (/exceeded the maximum allowed size|payload too large|413/i.test(raw)) {
-          friendly = 'Fișierul este prea mare (maxim 500 MB). Comprimă clipul și încearcă din nou.';
-        } else if (/already exists|duplicate/i.test(raw)) {
-          friendly = 'Fișierul există deja în galerie.';
-        } else if (/mime type|not supported/i.test(raw)) {
-          friendly = 'Formatul acestui fișier nu este acceptat.';
-        } else if (/network|failed to fetch/i.test(raw)) {
-          friendly = 'Conexiune întreruptă în timpul încărcării. Încearcă din nou.';
-        }
-        setItem(item.id, { status: 'error', progress: 0, error: friendly });
+        setItem(item.id, { status: 'error', progress: 0, error: friendlyError(error) });
+        failed++;
       }
     }
 
     setUploading(false);
     refreshGallery();
     if (ok > 0) toast({ title: `${ok} fișiere adăugate în galerie` });
+    if (failed > 0) {
+      toast({
+        title: `${failed} fișiere nu au putut fi încărcate`,
+        description: 'Apasă „Reîncearcă eșuate" ca să încerci din nou doar pentru ele.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const retryFailed = async () => {
+    setQueue((prev) =>
+      prev.map((item) =>
+        item.status === 'error' ? { ...item, status: 'pending', error: undefined, progress: 0 } : item,
+      ),
+    );
+    await new Promise((r) => setTimeout(r, 50));
+    uploadAll();
   };
 
   const clearFinished = () =>
@@ -241,6 +288,29 @@ const AdminPanel = () => {
       return resolveGalleryItems((data ?? []) as GalleryRow[]);
     },
   });
+
+  const reorderGallery = async (orderedIds: string[]) => {
+    queryClient.setQueryData(['admin_gallery'], (prev: unknown) => {
+      if (!Array.isArray(prev)) return prev;
+      const byId = new Map(prev.map((row) => [(row as { id: string }).id, row]));
+      return orderedIds.map((id, index) => ({ ...(byId.get(id) as object), sort_order: index }));
+    });
+
+    const results = await Promise.all(
+      orderedIds.map((id, index) =>
+        supabase.from('gallery_items').update({ sort_order: index }).eq('id', id),
+      ),
+    );
+    const failed = results.find((r) => r.error);
+    if (failed?.error) {
+      toast({
+        title: 'Nu am putut salva ordinea',
+        description: failed.error.message,
+        variant: 'destructive',
+      });
+    }
+    refreshGallery();
+  };
 
   const updateGalleryItem = async (id: string, patch: { title?: string; category?: string }) => {
     const { error } = await supabase.from('gallery_items').update(patch).eq('id', id);
@@ -586,6 +656,7 @@ const AdminPanel = () => {
     }
   );
   const pendingCount = queue.filter((i) => i.status === 'pending' || i.status === 'error').length;
+  const failedCount = queue.filter((i) => i.status === 'error').length;
 
 
 
@@ -748,15 +819,23 @@ const AdminPanel = () => {
                         <div className="p-3 space-y-2">
                           <p className="text-xs truncate text-foreground">{item.file.name}</p>
                           <p className="text-xs text-muted-foreground">{formatBytes(item.file.size)}</p>
-                          {item.status === 'working' && <Progress value={item.progress} className="h-1" />}
-                          <div className="flex items-center justify-between">
+                          <Progress
+                            value={item.status === 'done' ? 100 : item.progress}
+                            className="h-1.5"
+                          />
+                          <div className="flex items-center justify-between gap-2">
                             {item.status === 'done' ? (
                               <span className="text-xs text-green-500 flex items-center gap-1">
                                 <CheckCircle2 className="w-3 h-3" /> gata
                               </span>
                             ) : item.status === 'error' ? (
-                              <span className="text-xs text-destructive flex items-center gap-1">
-                                <XCircle className="w-3 h-3" /> {item.error?.slice(0, 24)}
+                              <span className="text-xs text-destructive flex items-center gap-1 truncate">
+                                <XCircle className="w-3 h-3 shrink-0" /> {item.error}
+                              </span>
+                            ) : item.status === 'working' ? (
+                              <span className="text-xs text-primary truncate">
+                                {item.progress}%
+                                {item.attempt && item.attempt > 1 ? ` · reîncercare ${item.attempt}/3` : ''}
                               </span>
                             ) : (
                               <span className="text-xs text-muted-foreground">în așteptare</span>
@@ -787,6 +866,11 @@ const AdminPanel = () => {
                       )}
                       Încarcă {pendingCount > 0 ? `(${pendingCount})` : ''}
                     </Button>
+                    {failedCount > 0 && (
+                      <Button variant="outline" onClick={retryFailed} disabled={uploading}>
+                        <RefreshCw className="w-4 h-4 mr-2" /> Reîncearcă eșuate ({failedCount})
+                      </Button>
+                    )}
                     <Button variant="ghost" onClick={clearFinished} disabled={uploading}>
                       Curăță lista
                     </Button>
@@ -814,49 +898,13 @@ const AdminPanel = () => {
             ) : (galleryQuery.data ?? []).length === 0 ? (
               <p className="text-muted-foreground">Galeria este goală. Adaugă primele poze mai sus.</p>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {(galleryQuery.data ?? []).map((item) => (
-                  <Card key={item.id} className="overflow-hidden bg-card/50">
-                    <div className="aspect-square bg-secondary/30 flex items-center justify-center overflow-hidden">
-                      {item.type === 'image' && item.thumbUrl ? (
-                        <img src={item.thumbUrl} alt={item.title} loading="lazy" className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-xs text-muted-foreground px-2 text-center break-all">VIDEO</span>
-                      )}
-                    </div>
-                    <div className="p-3 space-y-2">
-                      <Input
-                        defaultValue={item.title}
-                        className="h-8 text-sm"
-                        onBlur={(e) =>
-                          e.target.value !== item.title &&
-                          updateGalleryItem(item.id, { title: e.target.value })
-                        }
-                      />
-                      <div className="flex items-center justify-between gap-2">
-                        <select
-                          defaultValue={item.category}
-                          onChange={(e) => updateGalleryItem(item.id, { category: e.target.value })}
-                          className="h-8 rounded-md bg-secondary/40 border border-border text-xs px-2 text-foreground"
-                        >
-                          {Array.from(new Set([...CATEGORIES, item.category])).map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
-                          ))}
-                        </select>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => deleteItem(item.id, [item.src, item.video_url, item.thumb_path])}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+              <SortableGalleryGrid
+                items={galleryQuery.data ?? []}
+                categories={CATEGORIES}
+                onUpdate={updateGalleryItem}
+                onDelete={deleteItem}
+                onReorder={reorderGallery}
+              />
             )}
           </TabsContent>
 
