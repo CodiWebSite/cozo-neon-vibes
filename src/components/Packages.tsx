@@ -109,13 +109,6 @@ const Packages = () => {
             Pachete complete adaptate pentru orice tip de eveniment. 
             Servicii profesionale cu echipament, transport și setup inclus.
           </p>
-          {error && (
-            <div className="mt-4 p-3 bg-red-900/20 border border-red-700/50 rounded-lg">
-              <p className="text-red-400 text-sm">
-                {error} - Se afișează pachetele implicite.
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Packages Grid */}
