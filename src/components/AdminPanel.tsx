@@ -80,6 +80,8 @@ const AdminPanel = () => {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState('general');
+  const [newCategory, setNewCategory] = useState('');
+  const [savingCategories, setSavingCategories] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
   const [videoTitle, setVideoTitle] = useState('');
   const [dragOver, setDragOver] = useState(false);
