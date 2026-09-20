@@ -109,9 +109,9 @@ const Testimonials = () => {
     <section id="testimoniale" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
       <div className="container">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Ce spun clienții</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">{t('testimonials_title', 'Ce spun clienții')}</h2>
           <p className="text-lg text-muted-foreground">
-            Recenzii reale de la evenimente de neuitat
+            {t('testimonials_subtitle', 'Recenzii reale de la evenimente de neuitat')}
           </p>
         </div>
 
@@ -131,7 +131,7 @@ const Testimonials = () => {
 
         <div className="text-center mt-12">
           <a
-            href="https://www.facebook.com/DJDavidCozo/reviews"
+            href={t('testimonials_facebook_url', 'https://www.facebook.com/DJDavidCozo/reviews')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/25"
@@ -139,7 +139,7 @@ const Testimonials = () => {
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
-            Mai multe recenzii pe Facebook
+            {t('testimonials_facebook_button', 'Mai multe recenzii pe Facebook')}
           </a>
         </div>
       </div>

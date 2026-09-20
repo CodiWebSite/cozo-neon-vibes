@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Music, Users, Building, Heart, Star, Check, Loader2 } from 'lucide-react';
 import { getIconComponent } from '@/lib/iconUtils';
+import { useSiteContent } from '@/hooks/useSiteContent';
 import weddingImage from "@/assets/wedding-dj.jpg";
 import corporateImage from "@/assets/corporate-event.jpg";
 import clubImage from "@/assets/club-night.jpg";
@@ -20,67 +21,68 @@ interface Service {
 }
 
 const Services = () => {
+  const { t, tl } = useSiteContent();
   // Servicii afișate pe site
   const services: Service[] = [
 
     {
       id: 1,
-      title: "Nunți",
-      description: "Creez atmosfera perfectă pentru cea mai importantă zi din viața voastră",
+      title: t('service_1_title', 'Nunți'),
+      description: t('service_1_description', 'Creez atmosfera perfectă pentru cea mai importantă zi din viața voastră'),
       image: weddingImage,
       icon: "Heart",
-      features: [
+      features: tl('service_1_features', [
         "Consultanță muzicală personalizată",
         "Echipamente premium de sunet și lumini",
         "Mixuri personalizate pentru momentele speciale",
         "Backup complet pentru siguranță",
         "Coordonare cu fotograful și videograful"
-      ],
+      ]),
       gradient: "from-pink-500 to-rose-500"
     },
     {
       id: 2,
-      title: "Evenimente Corporate",
-      description: "Profesionalism și eleganță pentru evenimentele voastre de business",
+      title: t('service_2_title', 'Evenimente Corporate'),
+      description: t('service_2_description', 'Profesionalism și eleganță pentru evenimentele voastre de business'),
       image: corporateImage,
       icon: "Building",
-      features: [
+      features: tl('service_2_features', [
         "Prezentare profesională și discretă",
         "Muzică adaptată publicului corporate",
         "Sistem de sonorizare pentru prezentări",
         "Coordonare cu organizatorii evenimentului",
         "Flexibilitate în programul muzical"
-      ],
+      ]),
       gradient: "from-blue-500 to-cyan-500"
     },
     {
       id: 3,
-      title: "Cluburi & Baruri",
-      description: "Energie pură și vibrații electrizante pentru nopțile de neuitat",
+      title: t('service_3_title', 'Cluburi & Baruri'),
+      description: t('service_3_description', 'Energie pură și vibrații electrizante pentru nopțile de neuitat'),
       image: clubImage,
       icon: "Music",
-      features: [
+      features: tl('service_3_features', [
         "Mixuri live adaptate energiei publicului",
         "Repertoriu vast de muzică electronică",
         "Interacțiune cu publicul",
         "Efecte speciale de lumini și sunet",
         "Experiență în cluburi de top"
-      ],
+      ]),
       gradient: "from-purple-500 to-violet-500"
     },
     {
       id: 4,
-      title: "Evenimente Private",
-      description: "Petreceri personalizate pentru momente speciale cu prietenii",
+      title: t('service_4_title', 'Evenimente Private'),
+      description: t('service_4_description', 'Petreceri personalizate pentru momente speciale cu prietenii'),
       image: privateImage,
       icon: "Users",
-      features: [
+      features: tl('service_4_features', [
         "Atmosferă intimă și personalizată",
         "Playlist-uri create special pentru voi",
         "Echipamente adaptate spațiului",
         "Flexibilitate maximă în program",
         "Prețuri accesibile pentru grupuri mici"
-      ],
+      ]),
       gradient: "from-emerald-500 to-teal-500"
     }
   ];
@@ -99,13 +101,13 @@ const Services = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="border-cyan-400 text-cyan-400 mb-4">
-            Servicii DJ Premium
+            {t('services_badge', 'Servicii DJ Premium')}
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-            Servicii DJ <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Premium</span>
+            {t('services_title', 'Servicii DJ')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{t('services_title_accent', 'Premium')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Oferim servicii complete de DJ în Iași pentru toate tipurile de evenimente: DJ nunți, evenimente corporate, petreceri private și cluburi, cu echipamente premium și experiență vastă
+            {t('services_subtitle', 'Oferim servicii complete de DJ în Iași pentru toate tipurile de evenimente: DJ nunți, evenimente corporate, petreceri private și cluburi, cu echipamente premium și experiență vastă')}
           </p>
         </div>
 
@@ -152,7 +154,7 @@ const Services = () => {
                     onClick={scrollToContact}
                     className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
                   >
-                    Rezervă Acum
+                    {t('services_button', 'Rezervă Acum')}
                   </Button>
                 </div>
               </Card>
