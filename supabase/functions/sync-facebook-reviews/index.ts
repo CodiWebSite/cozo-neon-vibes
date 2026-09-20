@@ -100,10 +100,10 @@ Deno.serve(async (req) => {
       const row = {
         source: "facebook",
         external_id: externalId,
-        author_name: r.reviewer?.name ?? "Client Facebook",
+        author_name: r.reviewer?.name ?? "Recenzie Facebook",
         author_avatar: r.reviewer?.picture?.data?.url ?? null,
         content: text,
-        rating: r.rating ?? null,
+        rating: r.rating ?? (r.recommendation_type === "positive" ? 5 : null),
         recommendation_type: r.recommendation_type ?? null,
         permalink: `https://www.facebook.com/${pageId}/reviews`,
         reviewed_at: r.created_time ?? null,
