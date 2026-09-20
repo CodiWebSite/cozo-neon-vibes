@@ -85,7 +85,8 @@ const TestimonialCard = ({ item }: { item: TestimonialRow }) => {
 
 const Testimonials = () => {
   const { t } = useSiteContent();
-  const [showAll, setShowAll] = useState(false);
+  const PAGE_SIZE = 10;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const { data } = useQuery({
     queryKey: ["testimonials"],
@@ -105,7 +106,8 @@ const Testimonials = () => {
   const items = data ?? [];
   if (items.length === 0) return null;
 
-  const visible = showAll ? items : items.slice(0, 4);
+  const visible = items.slice(0, visibleCount);
+  const remaining = items.length - visible.length;
 
   return (
     <section id="testimoniale" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
@@ -123,11 +125,18 @@ const Testimonials = () => {
           ))}
         </div>
 
-        {items.length > 4 && (
-          <div className="text-center mt-8">
-            <Button variant="outline" onClick={() => setShowAll((v) => !v)}>
-              {showAll ? "Arată mai puține" : `Vezi toate recenziile (${items.length})`}
-            </Button>
+        {(remaining > 0 || visibleCount > PAGE_SIZE) && (
+          <div className="text-center mt-8 flex flex-wrap justify-center gap-3">
+            {remaining > 0 && (
+              <Button variant="outline" onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}>
+                Afișează mai multe ({remaining})
+              </Button>
+            )}
+            {visibleCount > PAGE_SIZE && (
+              <Button variant="ghost" onClick={() => setVisibleCount(PAGE_SIZE)}>
+                Arată mai puține
+              </Button>
+            )}
           </div>
         )}
 
