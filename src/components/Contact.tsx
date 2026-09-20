@@ -249,10 +249,11 @@ const Contact = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
+                    <label htmlFor="contact-name" className="text-sm font-medium text-foreground">
                       Nume Complet *
                     </label>
                     <Input
+                      id="contact-name"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
@@ -262,10 +263,11 @@ const Contact = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
+                    <label htmlFor="contact-email" className="text-sm font-medium text-foreground">
                       Email *
                     </label>
                     <Input
+                      id="contact-email"
                       name="email"
                       type="email"
                       value={formData.email}
@@ -279,10 +281,11 @@ const Contact = () => {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
+                    <label htmlFor="contact-phone" className="text-sm font-medium text-foreground">
                       Telefon
                     </label>
                     <Input
+                      id="contact-phone"
                       name="phone"
                       type="tel"
                       value={formData.phone}
@@ -292,10 +295,11 @@ const Contact = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
+                    <label htmlFor="contact-event-type" className="text-sm font-medium text-foreground">
                       Tip Eveniment *
                     </label>
                     <select
+                      id="contact-event-type"
                       name="event_type"
                       value={formData.event_type}
                       onChange={handleInputChange}
@@ -313,10 +317,11 @@ const Contact = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
+                  <label htmlFor="contact-event-date" className="text-sm font-medium text-foreground">
                     Data Evenimentului
                   </label>
                   <Input
+                    id="contact-event-date"
                     name="event_date"
                     type="date"
                     value={formData.event_date}
@@ -326,10 +331,11 @@ const Contact = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
+                  <label htmlFor="contact-message" className="text-sm font-medium text-foreground">
                     Mesajul Tău *
                   </label>
                   <Textarea
+                    id="contact-message"
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
@@ -449,13 +455,13 @@ const Contact = () => {
                     {t('contact_social_text', 'Conectează-te cu mine pe rețelele sociale')}
                   </p>
                   <div className="flex gap-4 justify-center mt-6">
-                    <a href={contactData.facebook} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
+                    <a href={contactData.facebook} target="_blank" rel="noreferrer" aria-label="DJ Cozo pe Facebook" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
                       <Facebook className="h-5 w-5 text-primary" />
                     </a>
-                    <a href={contactData.instagram} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
+                    <a href={contactData.instagram} target="_blank" rel="noreferrer" aria-label="DJ Cozo pe Instagram" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
                       <Instagram className="h-5 w-5 text-primary" />
                     </a>
-                    <a href={contactData.tiktok} target="_blank" rel="noreferrer" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
+                    <a href={contactData.tiktok} target="_blank" rel="noreferrer" aria-label="DJ Cozo pe TikTok" className="p-3 bg-secondary/30 rounded-full hover:bg-secondary/50 smooth-transition">
                       <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19.321 5.562a5.122 5.122 0 0 1-3.414-1.267 5.133 5.133 0 0 1-1.635-3.257h-3.858v13.506c0 1.741-1.416 3.158-3.158 3.158-1.742 0-3.158-1.417-3.158-3.158 0-1.741 1.416-3.158 3.158-3.158.348 0 .682.058 1 .16v-3.9a7.067 7.067 0 0 0-1-.072C3.158 7.574 0 10.732 0 14.63s3.158 7.058 7.056 7.058c3.899 0 7.056-3.158 7.056-7.058V9.321c1.537 1.094 3.399 1.745 5.209 1.745v-3.9c0-1.604 0-1.604 0-1.604Z" />
                       </svg>
