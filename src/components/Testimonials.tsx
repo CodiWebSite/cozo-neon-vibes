@@ -85,7 +85,8 @@ const TestimonialCard = ({ item }: { item: TestimonialRow }) => {
 
 const Testimonials = () => {
   const { t } = useSiteContent();
-  const [showAll, setShowAll] = useState(false);
+  const PAGE_SIZE = 10;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const { data } = useQuery({
     queryKey: ["testimonials"],
