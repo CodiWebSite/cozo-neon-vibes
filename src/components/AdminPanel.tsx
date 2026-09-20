@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { resolveGalleryItems, type GalleryRow } from '@/lib/galleryUrls';
-import { prepareImage, formatBytes } from '@/lib/imageUpload';
+import { prepareImage, prepareVideoPoster, formatBytes } from '@/lib/imageUpload';
 import {
   Loader2, Trash2, Upload, LogOut, Save, Mail, ExternalLink,
   ImagePlus, Link2, RefreshCw, Star, Eye, EyeOff, Plus, CheckCircle2, XCircle,
@@ -113,18 +113,40 @@ const AdminPanel = () => {
         if (isVideo) {
           const ext = item.file.name.split('.').pop() ?? 'mp4';
           const path = `${base}.${ext}`;
+
+          let poster: { thumb: Blob; width: number; height: number } | null = null;
+          try {
+            poster = await prepareVideoPoster(item.file);
+          } catch {
+            poster = null;
+          }
+
           setItem(item.id, { progress: 40 });
           const { error } = await supabase.storage.from('gallery').upload(path, item.file, {
             cacheControl: '31536000',
             contentType: item.file.type,
           });
           if (error) throw error;
+
+          let thumbPath: string | null = null;
+          if (poster) {
+            thumbPath = `${base}-thumb.webp`;
+            const upThumb = await supabase.storage.from('gallery').upload(thumbPath, poster.thumb, {
+              cacheControl: '31536000',
+              contentType: 'image/webp',
+            });
+            if (upThumb.error) thumbPath = null;
+          }
+
           setItem(item.id, { progress: 80 });
           const { error: dbError } = await supabase.from('gallery_items').insert({
             title: item.file.name.replace(/\.[^.]+$/, ''),
             category,
             type: 'video',
             video_url: path,
+            thumb_path: thumbPath,
+            width: poster?.width ?? null,
+            height: poster?.height ?? null,
           });
           if (dbError) throw dbError;
         } else {
