@@ -812,32 +812,79 @@ const AdminPanel = () => {
               <div className="space-y-3">
                 <label className="text-sm font-medium text-foreground">Categorie pentru încărcare</label>
                 <div className="flex flex-wrap gap-2">
-                  {categories.map((c) => (
-                    <Badge
-                      key={c}
-                      onClick={() => setCategory(c)}
-                      className={`cursor-pointer group gap-1 ${
-                        category === c
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-secondary text-muted-foreground'
-                      }`}
-                    >
-                      {c}
-                      {!DEFAULT_CATEGORIES.includes(c) && (
+                  {categories.map((c) =>
+                    editingCategory === c ? (
+                      <span key={c} className="flex items-center gap-1">
+                        <Input
+                          autoFocus
+                          value={editCategoryValue}
+                          onChange={(e) => setEditCategoryValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              renameCategory(c, editCategoryValue);
+                            }
+                            if (e.key === 'Escape') setEditingCategory(null);
+                          }}
+                          className="h-8 w-40"
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8"
+                          disabled={savingCategories}
+                          onClick={() => renameCategory(c, editCategoryValue)}
+                        >
+                          Salvează
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8"
+                          onClick={() => setEditingCategory(null)}
+                        >
+                          Renunță
+                        </Button>
+                      </span>
+                    ) : (
+                      <Badge
+                        key={c}
+                        onClick={() => setCategory(c)}
+                        className={`cursor-pointer group gap-1 ${
+                          category === c
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-muted-foreground'
+                        }`}
+                      >
+                        {c}
                         <button
                           type="button"
-                          aria-label={`Șterge categoria ${c}`}
+                          aria-label={`Redenumește categoria ${c}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            removeCategory(c);
+                            setEditingCategory(c);
+                            setEditCategoryValue(c);
                           }}
                           className="opacity-70 hover:opacity-100"
                         >
-                          <XCircle className="w-3 h-3" />
+                          <Pencil className="w-3 h-3" />
                         </button>
-                      )}
-                    </Badge>
-                  ))}
+                        {c !== 'general' && (
+                          <button
+                            type="button"
+                            aria-label={`Șterge categoria ${c}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeCategory(c);
+                            }}
+                            className="opacity-70 hover:opacity-100"
+                          >
+                            <XCircle className="w-3 h-3" />
+                          </button>
+                        )}
+                      </Badge>
+                    ),
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
                   <Input
