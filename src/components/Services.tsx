@@ -107,11 +107,6 @@ const Services = () => {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Oferim servicii complete de DJ în Iași pentru toate tipurile de evenimente: DJ nunți, evenimente corporate, petreceri private și cluburi, cu echipamente premium și experiență vastă
           </p>
-          {error && (
-            <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-red-400 text-sm max-w-md mx-auto">
-              {error}
-            </div>
-          )}
         </div>
 
         {/* Services Grid */}
