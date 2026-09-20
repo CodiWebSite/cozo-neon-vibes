@@ -187,8 +187,8 @@ const Gallery = () => {
 
         {isLightboxOpen && selectedItem !== null && galleryItems[selectedItem] && (
           <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
-            <DialogContent className="max-w-4xl w-full h-[90vh] bg-black border-gray-800 p-0">
-              <div className="relative w-full h-full flex items-center justify-center">
+            <DialogContent className="max-w-3xl w-[94vw] h-auto max-h-[88svh] bg-black border-gray-800 p-0 overflow-hidden">
+              <div className="relative w-full flex items-center justify-center">
                 <button
                   onClick={closeLightbox}
                   className="absolute top-4 right-4 z-10 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
@@ -210,21 +210,23 @@ const Gallery = () => {
                   <ChevronRight className="w-6 h-6" />
                 </button>
 
-                <div className="w-full h-full flex items-center justify-center px-6 pt-12 pb-28 overflow-hidden">
+                <div className="w-full flex items-center justify-center px-4 sm:px-6 pt-12 pb-24 overflow-hidden">
                   {galleryItems[selectedItem].type === 'image' ? (
                     <img
                       src={galleryItems[selectedItem].displayUrl ?? ''}
                       alt={galleryItems[selectedItem].title}
-                      className="max-w-full max-h-full w-auto h-auto object-contain"
+                      className="max-w-full max-h-[62svh] w-auto h-auto object-contain"
                     />
                   ) : isEmbed(galleryItems[selectedItem].video_url) ? (
-                    <iframe
-                      src={galleryItems[selectedItem].video_url ?? ''}
-                      className="w-full h-full max-h-full rounded-lg"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      title={galleryItems[selectedItem].title}
-                    />
+                    <div className="w-full aspect-video max-h-[62svh]">
+                      <iframe
+                        src={galleryItems[selectedItem].video_url ?? ''}
+                        className="w-full h-full rounded-lg"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={galleryItems[selectedItem].title}
+                      />
+                    </div>
                   ) : (
                     <video
                       src={galleryItems[selectedItem].displayUrl ?? ''}
@@ -235,7 +237,7 @@ const Gallery = () => {
                       }
                       controls
                       playsInline
-                      className="w-full h-full max-w-full max-h-full object-contain rounded-lg"
+                      className="max-w-full max-h-[62svh] w-auto h-auto object-contain rounded-lg"
                     />
                   )}
                 </div>
