@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, Star, Zap, Crown, Package, Loader2 } from 'lucide-react';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 interface PackageItem {
   id: string;
@@ -264,7 +265,7 @@ const Packages = () => {
         {/* Additional Info */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground mb-4">
-            Toate pachetele includ transport gratuit în orașul Iași.
+            {t('packages_note', 'Toate pachetele includ transport gratuit în orașul Iași.')}
           </p>
           <Button variant="outline" className="neon-border hover:glow-effect" onClick={scrollToContact}>
             Solicită Ofertă Personalizată
