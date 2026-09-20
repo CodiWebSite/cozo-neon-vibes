@@ -15,6 +15,13 @@
       "when": 1789901328840,
       "tag": "0001_storage_policies_and_admin_bootstrap",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789901615902,
+      "tag": "0002_tighten_function_grants",
+      "breakpoints": true
     }
   ]
 }
