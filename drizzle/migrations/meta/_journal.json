@@ -29,6 +29,13 @@
       "when": 1789901685835,
       "tag": "0003_testimonials_and_gallery_media",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789901979910,
+      "tag": "0004_schedule_facebook_reviews_sync",
+      "breakpoints": true
     }
   ]
 }
