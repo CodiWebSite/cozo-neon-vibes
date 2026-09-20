@@ -545,7 +545,14 @@ const AdminPanel = () => {
     return map[status] ?? { label: status, tone: 'outline' as const };
   };
 
-  const sections = Array.from(new Set((contentQuery.data ?? []).map((row) => row.section)));
+  const SECTION_ORDER = ['Hero', 'Despre', 'Servicii', 'Pachete', 'Galerie', 'Recenzii', 'Contact', 'Subsol'];
+  const sections = Array.from(new Set((contentQuery.data ?? []).map((row) => row.section))).sort(
+    (a, b) => {
+      const ia = SECTION_ORDER.indexOf(a);
+      const ib = SECTION_ORDER.indexOf(b);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib) || a.localeCompare(b);
+    }
+  );
   const pendingCount = queue.filter((i) => i.status === 'pending' || i.status === 'error').length;
 
 
