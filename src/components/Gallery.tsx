@@ -52,6 +52,18 @@ const Gallery = () => {
 
   const isEmbed = (url: string | null) => !!url && /^https?:\/\//i.test(url);
 
+  // Navigare din tastatură în lightbox
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') nextItem();
+      if (e.key === 'ArrowLeft') prevItem();
+      if (e.key === 'Escape') closeLightbox();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   return (
     <section id="gallery" className="py-20 bg-black">
       <div className="container mx-auto px-4">
