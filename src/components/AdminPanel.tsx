@@ -186,11 +186,18 @@ const AdminPanel = () => {
         setItem(item.id, { status: 'done', progress: 100 });
         ok++;
       } catch (error) {
-        setItem(item.id, {
-          status: 'error',
-          progress: 0,
-          error: error instanceof Error ? error.message : 'Eroare',
-        });
+        const raw = error instanceof Error ? error.message : 'Eroare';
+        let friendly = raw;
+        if (/exceeded the maximum allowed size|payload too large|413/i.test(raw)) {
+          friendly = 'Fișierul este prea mare (maxim 500 MB). Comprimă clipul și încearcă din nou.';
+        } else if (/already exists|duplicate/i.test(raw)) {
+          friendly = 'Fișierul există deja în galerie.';
+        } else if (/mime type|not supported/i.test(raw)) {
+          friendly = 'Formatul acestui fișier nu este acceptat.';
+        } else if (/network|failed to fetch/i.test(raw)) {
+          friendly = 'Conexiune întreruptă în timpul încărcării. Încearcă din nou.';
+        }
+        setItem(item.id, { status: 'error', progress: 0, error: friendly });
       }
     }
 
