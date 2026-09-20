@@ -131,10 +131,14 @@ const Gallery = () => {
                   onClick={() => openLightbox(index)}
                 >
                   <div
-                    className="relative overflow-hidden"
+                    className="relative overflow-hidden max-h-[60vh]"
                     style={{
                       aspectRatio:
-                        item.width && item.height ? `${item.width} / ${item.height}` : '1 / 1',
+                        item.width && item.height
+                          ? `${item.width} / ${item.height}`
+                          : item.type === 'video'
+                            ? '16 / 9'
+                            : '1 / 1',
                     }}
                   >
                     {item.type === 'image' ? (
@@ -231,7 +235,7 @@ const Gallery = () => {
                       }
                       controls
                       playsInline
-                      className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg"
+                      className="w-full h-full max-w-full max-h-full object-contain rounded-lg"
                     />
                   )}
                 </div>
