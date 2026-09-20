@@ -423,8 +423,105 @@ const AdminPanel = () => {
     queryClient.invalidateQueries({ queryKey: ['admin_admins'] });
   };
 
+  /* ---------------- Invitații ---------------- */
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviting, setInviting] = useState(false);
+  const [lastInviteLink, setLastInviteLink] = useState<{ email: string; url: string; emailed: boolean } | null>(null);
+
+  const invitationsQuery = useQuery({
+    queryKey: ['admin_invitations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_invitations')
+        .select('id, email, status, expires_at, created_at, accepted_at, email_sent_at')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const sendInvite = async () => {
+    const email = inviteEmail.trim();
+    if (!email) return;
+    setInviting(true);
+    const { data, error } = await supabase.rpc('create_admin_invitation', { _email: email });
+    const result = (data ?? {}) as { ok?: boolean; error?: string; token?: string; id?: string };
+
+    if (error || !result.ok) {
+      setInviting(false);
+      const map: Record<string, string> = {
+        already_admin: 'Această persoană este deja administrator.',
+        invalid_email: 'Adresa de email nu pare corectă.',
+        not_authorized: 'Nu ai dreptul să trimiți invitații.',
+      };
+      toast({
+        title: 'Invitația nu a fost creată',
+        description: map[result.error ?? ''] ?? error?.message ?? 'Încearcă din nou.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const url = `${window.location.origin}/admin/invitatie?token=${result.token}`;
+
+    let emailed = false;
+    try {
+      const { error: mailError } = await supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'admin-invitation',
+          recipientEmail: email,
+          idempotencyKey: `admin-invite-${result.id}`,
+          templateData: { inviteUrl: url },
+        },
+      });
+      emailed = !mailError;
+    } catch {
+      emailed = false;
+    }
+
+    if (emailed) {
+      await supabase.from('admin_invitations').update({ email_sent_at: new Date().toISOString() }).eq('id', result.id!);
+    }
+
+    setInviting(false);
+    setInviteEmail('');
+    setLastInviteLink({ email, url, emailed });
+    toast({
+      title: emailed ? 'Invitație trimisă pe email' : 'Invitație creată',
+      description: emailed ? email : 'Trimiterea pe email nu este încă activă — copiază linkul de mai jos.',
+    });
+    queryClient.invalidateQueries({ queryKey: ['admin_invitations'] });
+  };
+
+  const revokeInvite = async (id: string) => {
+    const { data, error } = await supabase.rpc('revoke_admin_invitation', { _id: id });
+    const result = (data ?? {}) as { ok?: boolean; error?: string };
+    if (error || !result.ok) {
+      toast({
+        title: 'Nu am putut anula invitația',
+        description: error?.message ?? 'Invitația nu mai este în așteptare.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    toast({ title: 'Invitație anulată' });
+    queryClient.invalidateQueries({ queryKey: ['admin_invitations'] });
+  };
+
+  const inviteStatusLabel = (status: string, expiresAt: string) => {
+    if (status === 'pending' && new Date(expiresAt) < new Date()) return { label: 'Expirată', tone: 'outline' as const };
+    const map: Record<string, { label: string; tone: 'default' | 'outline' | 'secondary' }> = {
+      pending: { label: 'În așteptare', tone: 'default' },
+      accepted: { label: 'Acceptată', tone: 'secondary' },
+      revoked: { label: 'Anulată', tone: 'outline' },
+      expired: { label: 'Expirată', tone: 'outline' },
+    };
+    return map[status] ?? { label: status, tone: 'outline' as const };
+  };
+
   const sections = Array.from(new Set((contentQuery.data ?? []).map((row) => row.section)));
   const pendingCount = queue.filter((i) => i.status === 'pending' || i.status === 'error').length;
+
 
 
   return (
