@@ -977,7 +977,79 @@ const AdminPanel = () => {
                 ))
               )}
             </div>
+
+            <Card className="p-6 space-y-4 bg-card/50">
+              <div>
+                <h3 className="font-heading font-semibold text-foreground">Invită un administrator nou</h3>
+                <p className="text-sm text-muted-foreground">
+                  Trimite o invitație pe email. Persoana își alege singură parola și primește acces automat.
+                  Invitația este valabilă 7 zile și o poți anula oricând până când e folosită.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Input
+                  type="email"
+                  placeholder="email@exemplu.ro"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  className="max-w-xs"
+                />
+                <Button onClick={sendInvite} disabled={inviting || !inviteEmail.trim()}>
+                  {inviting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Mail className="w-4 h-4 mr-2" />}
+                  Trimite invitația
+                </Button>
+              </div>
+
+              {lastInviteLink && (
+                <div className="rounded-lg border border-border/60 bg-background/40 p-4 space-y-2">
+                  <p className="text-sm text-foreground">
+                    {lastInviteLink.emailed
+                      ? `Invitație trimisă către ${lastInviteLink.email}. Poți folosi și linkul de mai jos:`
+                      : `Trimite manual acest link către ${lastInviteLink.email}:`}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Input readOnly value={lastInviteLink.url} className="flex-1 min-w-[240px] text-xs" />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(lastInviteLink.url);
+                        toast({ title: 'Link copiat' });
+                      }}
+                    >
+                      Copiază linkul
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+
+            <div className="space-y-3">
+              {(invitationsQuery.data ?? []).map((invite) => {
+                const status = inviteStatusLabel(invite.status, invite.expires_at);
+                return (
+                  <Card key={invite.id} className="p-4 flex flex-wrap items-center justify-between gap-3 bg-card/50">
+                    <div>
+                      <p className="font-medium text-foreground">{invite.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Trimisă {new Date(invite.created_at).toLocaleDateString('ro-RO')} · expiră{' '}
+                        {new Date(invite.expires_at).toLocaleDateString('ro-RO')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={status.tone === 'default' ? undefined : status.tone}>{status.label}</Badge>
+                      {invite.status === 'pending' && (
+                        <Button size="sm" variant="ghost" onClick={() => revokeInvite(invite.id)}>
+                          <XCircle className="w-4 h-4 text-destructive mr-2" /> Anulează
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           </TabsContent>
+
         </Tabs>
 
       </main>
