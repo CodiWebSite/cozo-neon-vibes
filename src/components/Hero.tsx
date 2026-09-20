@@ -8,7 +8,7 @@ const Hero = () => {
   const content = {
     title: 'Creez Experiențe Memorabile',
     subtitle: 'DJ Profesionist Iași',
-    description: 'DJ profesionist în Iași cu peste 8 ani experiență în evenimente premium. Specializat în DJ nunți, evenimente corporate, petreceri private și cluburi exclusive în Moldova.',
+    description: 'DJ profesionist în Iași cu peste 12 ani experiență în evenimente premium. Specializat în DJ nunți, evenimente corporate, petreceri private și cluburi exclusive în regiunea Moldovei.',
     primaryButton: 'Rezervă DJ Acum',
     secondaryButton: 'Vezi Servicii DJ'
   };

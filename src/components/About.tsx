@@ -22,7 +22,7 @@ const About = () => {
     },
     {
       icon: Award,
-      number: "8+",
+      number: "12+",
       label: "Ani Experiență"
     },
     {
@@ -51,12 +51,12 @@ const About = () => {
                 Pasiune și <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Profesionalism</span>
               </h2>
               <p className="text-lg text-gray-300 leading-relaxed">
-                Sunt DJ Cozo, un DJ profesionist din Iași cu peste 8 ani de experiență în industria divertismentului. 
-                Activez în Iași și întreaga regiune Moldova, specializat în evenimente premium unde aduc energie și atmosferă perfectă.
+                Sunt DJ Cozo, un DJ profesionist din Iași cu peste 12 ani de experiență în industria divertismentului. 
+                Activez în Iași și în întreaga regiune a Moldovei, specializat în evenimente premium, unde aduc energia și creez o atmosferă perfectă.
               </p>
               <p className="text-gray-400 leading-relaxed">
-                De-a lungul carierei mele am avut privilegiul să contribui la crearea de momente magice la sute de evenimente în Iași - 
-                de la DJ nunți romantice și evenimente corporate elegante până la cluburi exclusiviste și petreceri private în Moldova.
+                De-a lungul carierei mele am avut privilegiul să contribui la crearea de momente magice la sute de evenimente din Iași și nu numai - 
+                de la DJ nunți romantice și evenimente corporate elegante până la cluburi exclusiviste și petreceri private în regiunea Moldovei.
               </p>
             </div>
 
