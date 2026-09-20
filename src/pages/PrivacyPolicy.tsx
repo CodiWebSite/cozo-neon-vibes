@@ -1,10 +1,25 @@
 import React from 'react';
 import { ArrowLeft, Shield, FileText, Users, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <Helmet>
+        <title>Politici Legale | DJ Cozo</title>
+        <meta
+          name="description"
+          content="Termeni și condiții, politica de confidențialitate și politica de cookie-uri pentru serviciile DJ Cozo din Iași."
+        />
+        <link rel="canonical" href="https://dj-cozo.ro/politici" />
+        <meta property="og:title" content="Politici Legale | DJ Cozo" />
+        <meta
+          property="og:description"
+          content="Termeni și condiții, politica de confidențialitate și politica de cookie-uri pentru serviciile DJ Cozo."
+        />
+        <meta property="og:url" content="https://dj-cozo.ro/politici" />
+      </Helmet>
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-sm border-b border-purple-500/20">
         <div className="container mx-auto px-4 py-6">
