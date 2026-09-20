@@ -3,8 +3,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Music, Award, Users, Clock } from 'lucide-react';
 import djPortrait from "@/assets/dj-portrait.jpg";
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const About = () => {
+  const { t } = useSiteContent();
+
   const skills = [
     "Mixing Profesional",
     "Echipamente Premium", 
@@ -17,17 +20,17 @@ const About = () => {
   const stats = [
     {
       icon: Music,
-      number: "500+",
+      number: t('about_stat_events', '500+'),
       label: "Evenimente"
     },
     {
       icon: Award,
-      number: "12+",
+      number: t('about_stat_years', '12+'),
       label: "Ani Experiență"
     },
     {
       icon: Users,
-      number: "10K+",
+      number: t('about_stat_people', '10K+'),
       label: "Oameni Fericiți"
     },
     {
