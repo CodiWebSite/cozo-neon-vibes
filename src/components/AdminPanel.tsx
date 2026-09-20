@@ -339,6 +339,7 @@ const AdminPanel = () => {
 
   /* ---------------- Conținut ---------------- */
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [contentSearch, setContentSearch] = useState('');
   const [savingKey, setSavingKey] = useState<string | null>(null);
 
   const contentQuery = useQuery({
@@ -904,23 +905,53 @@ const AdminPanel = () => {
 
           {/* CONTINUT */}
           <TabsContent value="continut" className="space-y-6">
+            <Card className="p-4 bg-card/50 space-y-2">
+              <label className="text-sm font-medium text-foreground">Caută un text</label>
+              <Input
+                placeholder="ex: titlu, pachet, WhatsApp..."
+                value={contentSearch}
+                onChange={(e) => setContentSearch(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Poți modifica orice text de pe site. La câmpurile tip listă, scrie fiecare element pe
+                câte un rând nou. Modificările apar imediat pe site după ce apeși Salvează.
+              </p>
+            </Card>
+
             {contentQuery.isLoading ? (
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             ) : (
-              sections.map((section) => (
-                <Card key={section} className="p-6 space-y-4 bg-card/50">
-                  <h2 className="text-lg font-heading font-bold text-foreground">{section}</h2>
-                  {(contentQuery.data ?? [])
-                    .filter((row) => row.section === section)
-                    .map((row) => {
+              sections.map((section) => {
+                const term = contentSearch.trim().toLowerCase();
+                const rows = (contentQuery.data ?? [])
+                  .filter((row) => row.section === section)
+                  .filter(
+                    (row) =>
+                      term.length === 0 ||
+                      row.label.toLowerCase().includes(term) ||
+                      row.content_value.toLowerCase().includes(term) ||
+                      row.section.toLowerCase().includes(term)
+                  )
+                  .sort((a, b) => a.content_key.localeCompare(b.content_key));
+
+                if (rows.length === 0) return null;
+
+                return (
+                  <Card key={section} className="p-6 space-y-5 bg-card/50">
+                    <h2 className="text-lg font-heading font-bold text-foreground">{section}</h2>
+                    {rows.map((row) => {
                       const value = drafts[row.content_key] ?? row.content_value;
-                      const long = row.content_value.length > 80;
+                      const isList = row.content_value.includes('\n');
+                      const long = isList || row.content_value.length > 80;
                       return (
-                        <div key={row.content_key} className="space-y-2">
+                        <div key={row.content_key} className="space-y-2 border-b border-border/40 pb-4 last:border-0 last:pb-0">
                           <label className="text-sm font-medium text-foreground">{row.label}</label>
+                          {isList && (
+                            <p className="text-xs text-muted-foreground">Câte un element pe fiecare rând</p>
+                          )}
                           {long ? (
                             <Textarea
-                              rows={3}
+                              rows={isList ? Math.min(12, value.split('\n').length + 1) : 3}
                               value={value}
                               onChange={(e) => setDrafts({ ...drafts, [row.content_key]: e.target.value })}
                             />
@@ -930,24 +961,40 @@ const AdminPanel = () => {
                               onChange={(e) => setDrafts({ ...drafts, [row.content_key]: e.target.value })}
                             />
                           )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={savingKey === row.content_key || value === row.content_value}
-                            onClick={() => saveContent(row.content_key, value)}
-                          >
-                            {savingKey === row.content_key ? (
-                              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                            ) : (
-                              <Save className="w-4 h-4 mr-2" />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={savingKey === row.content_key || value === row.content_value}
+                              onClick={() => saveContent(row.content_key, value)}
+                            >
+                              {savingKey === row.content_key ? (
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                              ) : (
+                                <Save className="w-4 h-4 mr-2" />
+                              )}
+                              Salvează
+                            </Button>
+                            {value !== row.content_value && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  const next = { ...drafts };
+                                  delete next[row.content_key];
+                                  setDrafts(next);
+                                }}
+                              >
+                                Renunță
+                              </Button>
                             )}
-                            Salvează
-                          </Button>
+                          </div>
                         </div>
                       );
                     })}
-                </Card>
-              ))
+                  </Card>
+                );
+              })
             )}
           </TabsContent>
 
