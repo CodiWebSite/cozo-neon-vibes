@@ -20,12 +20,9 @@ interface Service {
 }
 
 const Services = () => {
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Servicii afișate pe site
+  const services: Service[] = [
 
-  // Servicii implicite ca fallback
-  const defaultServices: Service[] = [
     {
       id: 1,
       title: "Nunți",
