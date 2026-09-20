@@ -19,6 +19,7 @@ interface PackageItem {
 }
 
 const Packages = () => {
+  const { t } = useSiteContent();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
