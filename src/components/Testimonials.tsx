@@ -125,11 +125,18 @@ const Testimonials = () => {
           ))}
         </div>
 
-        {items.length > 4 && (
-          <div className="text-center mt-8">
-            <Button variant="outline" onClick={() => setShowAll((v) => !v)}>
-              {showAll ? "Arată mai puține" : `Vezi toate recenziile (${items.length})`}
-            </Button>
+        {(remaining > 0 || visibleCount > PAGE_SIZE) && (
+          <div className="text-center mt-8 flex flex-wrap justify-center gap-3">
+            {remaining > 0 && (
+              <Button variant="outline" onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}>
+                Afișează mai multe ({remaining})
+              </Button>
+            )}
+            {visibleCount > PAGE_SIZE && (
+              <Button variant="ghost" onClick={() => setVisibleCount(PAGE_SIZE)}>
+                Arată mai puține
+              </Button>
+            )}
           </div>
         )}
 
