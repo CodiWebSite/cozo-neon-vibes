@@ -99,8 +99,11 @@ const Hero = () => {
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight">
-              <span className="block">{t('hero_title_prefix', 'Creez')}</span>
-              <span className="block gradient-text typewriter-text">
+              <span className="sr-only">
+                {t('hero_seo_title', 'DJ Cozo — DJ profesionist pentru nunți, evenimente corporate și petreceri private în Iași')}
+              </span>
+              <span className="block" aria-hidden="true">{t('hero_title_prefix', 'Creez')}</span>
+              <span className="block gradient-text typewriter-text" aria-hidden="true">
                 {typedText}
                 <span className="typewriter-cursor">{cursor}</span>
               </span>

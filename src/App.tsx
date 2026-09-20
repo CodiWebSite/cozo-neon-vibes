@@ -11,7 +11,6 @@ import BackToTop from "./components/BackToTop";
 import { useCookieConsent } from "./hooks/use-cookie-consent";
 
 // Paginile secundare se încarcă doar când sunt cerute — prima pagină rămâne ușoară
-const SimpleTest = lazy(() => import("./pages/SimpleTest"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -60,7 +59,6 @@ const App = () => {
             <Suspense fallback={null}>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/test" element={<SimpleTest />} />
                 <Route path="/politici" element={<PrivacyPolicy />} />
                 <Route path="/admin/invitatie" element={<AdminInvite />} />
                 <Route path="/admin" element={<Admin />} />

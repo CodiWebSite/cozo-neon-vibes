@@ -48,7 +48,7 @@ const Header = () => {
             className="flex items-center cursor-pointer"
             onClick={() => scrollToSection('hero')}
           >
-            <img src={logoImg} alt="DJ Cozo Logo" className="h-16 w-auto" />
+            <img src={logoImg} alt="DJ Cozo - DJ profesionist pentru nunți și evenimente în Iași" className="h-16 w-auto" />
           </div>
 
           {/* Desktop Navigation */}
@@ -75,6 +75,8 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             className="lg:hidden p-2"
+            aria-label={isMenuOpen ? 'Închide meniul' : 'Deschide meniul'}
+            aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
