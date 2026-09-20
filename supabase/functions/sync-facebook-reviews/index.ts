@@ -109,9 +109,17 @@ Deno.serve(async (req) => {
         reviewed_at: r.created_time ?? null,
       };
 
-      const { error } = await admin
+      // Dacă recenzia există deja, păstrăm numele editat manual în panou.
+      const { data: existing } = await admin
         .from("testimonials")
-        .upsert(row, { onConflict: "external_id", ignoreDuplicates: false });
+        .select("id")
+        .eq("external_id", externalId)
+        .maybeSingle();
+
+      const { author_name: _fbName, ...rowNoName } = row;
+      const { error } = existing
+        ? await admin.from("testimonials").update(rowNoName).eq("id", existing.id)
+        : await admin.from("testimonials").insert(row);
 
       if (error) {
         console.error("upsert failed", error.message);
