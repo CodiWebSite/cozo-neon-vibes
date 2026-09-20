@@ -129,7 +129,7 @@ const Contact = () => {
           </h2>
           <p className="text-lg text-muted-foreground">
             Sunt gata să transform evenimentul tău într-o experiență de neuitat. 
-            Contactează-mă pentru o consultație gratuită!
+            Contactează-mă pentru mai multe informații!
           </p>
         </div>
 
