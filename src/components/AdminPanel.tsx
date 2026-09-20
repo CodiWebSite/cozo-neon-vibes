@@ -74,6 +74,8 @@ const AdminPanel = () => {
   const [videoTitle, setVideoTitle] = useState('');
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = useCallback((files: FileList | File[]) => {
     const accepted = Array.from(files).filter(
