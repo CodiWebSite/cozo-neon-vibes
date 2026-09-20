@@ -6,7 +6,7 @@ import { useTypewriter } from '@/hooks/useTypewriter';
 import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Hero = () => {
-  const { t } = useSiteContent();
+  const { t, tl } = useSiteContent();
 
   const content = {
     title: 'Creez Experiențe Memorabile',
@@ -20,7 +20,7 @@ const Hero = () => {
   };
 
   // Efectul de typing pentru titlu
-  const typewriterWords = [
+  const typewriterWords = tl('hero_typewriter_words', [
     'Experiențe Memorabile',
     'Momente Magice',
     'Petreceri Perfecte',
@@ -29,7 +29,7 @@ const Hero = () => {
     'Vibrații Perfecte',
     'Spectacole Unice',
     'Amintiri de Neuitat'
-  ];
+  ]);
 
   const { text: typedText, cursor } = useTypewriter({
     words: typewriterWords,
@@ -99,7 +99,7 @@ const Hero = () => {
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight">
-              <span className="block">Creez</span>
+              <span className="block">{t('hero_title_prefix', 'Creez')}</span>
               <span className="block gradient-text typewriter-text">
                 {typedText}
                 <span className="typewriter-cursor">{cursor}</span>

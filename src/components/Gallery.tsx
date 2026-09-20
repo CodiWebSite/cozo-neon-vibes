@@ -6,8 +6,10 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X, ChevronLeft, ChevronRight, Play, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { resolveGalleryItems, type GalleryRow } from '@/lib/galleryUrls';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Gallery = () => {
+  const { t } = useSiteContent();
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -69,10 +71,10 @@ const Gallery = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Galerie <span className="text-neon-cyan">Foto & Video</span>
+            {t('gallery_title', 'Galerie')} <span className="text-neon-cyan">{t('gallery_title_accent', 'Foto & Video')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Descoperă momentele speciale și energia unică din evenimentele mele
+            {t('gallery_subtitle', 'Descoperă momentele speciale și energia unică din evenimentele mele')}
           </p>
         </div>
 
@@ -84,10 +86,9 @@ const Gallery = () => {
         ) : allItems.length === 0 ? (
           <div className="text-center py-20">
             <Upload className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-white mb-4">Galeria este goală</h3>
+            <h3 className="text-2xl font-semibold text-white mb-4">{t('gallery_empty_title', 'Galeria este goală')}</h3>
             <p className="text-gray-400 max-w-md mx-auto">
-              Momentan nu există imagini sau video-uri în galerie. Acestea vor fi adăugate în curând
-              prin panoul de administrare.
+              {t('gallery_empty_text', 'Momentan nu există imagini sau video-uri în galerie. Acestea vor fi adăugate în curând prin panoul de administrare.')}
             </p>
           </div>
         ) : (

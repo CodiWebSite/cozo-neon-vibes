@@ -6,37 +6,37 @@ import djPortrait from "@/assets/dj-portrait.jpg";
 import { useSiteContent } from '@/hooks/useSiteContent';
 
 const About = () => {
-  const { t } = useSiteContent();
+  const { t, tl } = useSiteContent();
 
-  const skills = [
+  const skills = tl('about_skills', [
     "Mixing Profesional",
-    "Echipamente Premium", 
+    "Echipamente Premium",
     "Repertoriu Vast",
     "Adaptabilitate",
     "Experiență Live",
     "Tehnologie Avansată"
-  ];
+  ]);
 
   const stats = [
     {
       icon: Music,
       number: t('about_stat_events', '500+'),
-      label: "Evenimente"
+      label: t('about_stat_events_label', 'Evenimente')
     },
     {
       icon: Award,
       number: t('about_stat_years', '12+'),
-      label: "Ani Experiență"
+      label: t('about_stat_years_label', 'Ani Experiență')
     },
     {
       icon: Users,
       number: t('about_stat_people', '10K+'),
-      label: "Oameni Fericiți"
+      label: t('about_stat_people_label', 'Oameni Fericiți')
     },
     {
       icon: Clock,
-      number: "24/7",
-      label: "Disponibilitate"
+      number: t('about_stat_available', '24/7'),
+      label: t('about_stat_available_label', 'Disponibilitate')
     }
   ];
 
@@ -48,10 +48,10 @@ const About = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <Badge variant="outline" className="border-cyan-400 text-cyan-400">
-                Despre Mine
+                {t('about_badge', 'Despre Mine')}
               </Badge>
               <h2 className="text-4xl lg:text-5xl font-bold text-white">
-                Pasiune și <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Profesionalism</span>
+                {t('about_title', 'Pasiune și')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{t('about_title_accent', 'Profesionalism')}</span>
               </h2>
               <p className="text-lg text-gray-300 leading-relaxed">
                 {t('about_paragraph_1', 'Sunt DJ Cozo, un DJ profesionist din Iași cu peste 12 ani de experiență în industria divertismentului. Activez în Iași și în întreaga regiune a Moldovei, specializat în evenimente premium, unde aduc energia și creez o atmosferă perfectă.')}
@@ -63,7 +63,7 @@ const About = () => {
 
             {/* Skills */}
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-white">Expertiza Mea:</h3>
+              <h3 className="text-xl font-semibold text-white">{t('about_skills_title', 'Expertiza Mea:')}</h3>
               <div className="grid grid-cols-2 gap-3">
                 {skills.map((skill, index) => (
                   <div key={index} className="flex items-center space-x-2">
@@ -100,8 +100,8 @@ const About = () => {
             {/* Floating Element */}
             <div className="absolute -bottom-6 -right-6 bg-gradient-to-r from-cyan-400 to-purple-400 p-6 rounded-2xl shadow-2xl">
               <div className="text-center">
-                <div className="text-2xl font-bold text-black">DJ COZO</div>
-                <div className="text-sm text-black/80">Professional DJ</div>
+                <div className="text-2xl font-bold text-black">{t('about_badge_name', 'DJ COZO')}</div>
+                <div className="text-sm text-black/80">{t('about_badge_role', 'Professional DJ')}</div>
               </div>
             </div>
           </div>
