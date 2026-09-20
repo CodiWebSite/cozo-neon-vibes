@@ -366,8 +366,66 @@ const AdminPanel = () => {
     queryClient.invalidateQueries({ queryKey: ['admin_messages'] });
   };
 
+  /* ---------------- Administratori ---------------- */
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [savingAdmin, setSavingAdmin] = useState(false);
+
+  const adminsQuery = useQuery({
+    queryKey: ['admin_admins'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('list_admins');
+      if (error) throw error;
+      return (data ?? []) as { user_id: string; email: string; created_at: string }[];
+    },
+  });
+
+  const addAdmin = async () => {
+    const email = newAdminEmail.trim();
+    if (!email) return;
+    setSavingAdmin(true);
+    const { data, error } = await supabase.rpc('grant_admin_by_email', { _email: email });
+    setSavingAdmin(false);
+    const result = (data ?? {}) as { ok?: boolean; error?: string };
+    if (error || !result.ok) {
+      const map: Record<string, string> = {
+        user_not_found: 'Nu există niciun cont cu acest email. Persoana trebuie mai întâi să își creeze cont pe /admin.',
+        not_authorized: 'Nu ai dreptul să faci această modificare.',
+      };
+      toast({
+        title: 'Nu am putut adăuga administratorul',
+        description: map[result.error ?? ''] ?? error?.message ?? 'Încearcă din nou.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setNewAdminEmail('');
+    toast({ title: 'Administrator adăugat', description: email });
+    queryClient.invalidateQueries({ queryKey: ['admin_admins'] });
+  };
+
+  const removeAdmin = async (userId: string) => {
+    const { data, error } = await supabase.rpc('revoke_admin', { _user_id: userId });
+    const result = (data ?? {}) as { ok?: boolean; error?: string };
+    if (error || !result.ok) {
+      const map: Record<string, string> = {
+        cannot_remove_self: 'Nu îți poți retrage ție drepturile de administrator.',
+        last_admin: 'Trebuie să rămână cel puțin un administrator.',
+        not_authorized: 'Nu ai dreptul să faci această modificare.',
+      };
+      toast({
+        title: 'Nu am putut retrage accesul',
+        description: map[result.error ?? ''] ?? error?.message ?? 'Încearcă din nou.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    toast({ title: 'Acces retras' });
+    queryClient.invalidateQueries({ queryKey: ['admin_admins'] });
+  };
+
   const sections = Array.from(new Set((contentQuery.data ?? []).map((row) => row.section)));
   const pendingCount = queue.filter((i) => i.status === 'pending' || i.status === 'error').length;
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -402,7 +460,9 @@ const AdminPanel = () => {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="admini">Administratori</TabsTrigger>
           </TabsList>
+
 
           {/* GALERIE */}
           <TabsContent value="galerie" className="space-y-6">
@@ -775,7 +835,54 @@ const AdminPanel = () => {
               ))
             )}
           </TabsContent>
+
+          {/* ADMINISTRATORI */}
+          <TabsContent value="admini" className="space-y-6">
+            <Card className="p-6 space-y-4 bg-card/50">
+              <div>
+                <h3 className="font-heading font-semibold text-foreground">Adaugă un administrator</h3>
+                <p className="text-sm text-muted-foreground">
+                  Persoana trebuie mai întâi să își creeze singură un cont pe pagina /admin („Creează-l aici").
+                  Apoi scrii aici emailul ei și primește acces complet la panou.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Input
+                  type="email"
+                  placeholder="email@exemplu.ro"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  className="max-w-xs"
+                />
+                <Button onClick={addAdmin} disabled={savingAdmin || !newAdminEmail.trim()}>
+                  {savingAdmin ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+                  Adaugă
+                </Button>
+              </div>
+            </Card>
+
+            <div className="space-y-3">
+              {adminsQuery.isLoading ? (
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              ) : (
+                (adminsQuery.data ?? []).map((admin) => (
+                  <Card key={admin.user_id} className="p-4 flex flex-wrap items-center justify-between gap-3 bg-card/50">
+                    <div>
+                      <p className="font-medium text-foreground">{admin.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Administrator din {new Date(admin.created_at).toLocaleDateString('ro-RO')}
+                      </p>
+                    </div>
+                    <Button size="sm" variant="ghost" onClick={() => removeAdmin(admin.user_id)}>
+                      <Trash2 className="w-4 h-4 text-destructive mr-2" /> Retrage accesul
+                    </Button>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
+
       </main>
     </div>
   );
