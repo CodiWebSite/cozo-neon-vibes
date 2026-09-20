@@ -325,6 +325,18 @@ const AdminPanel = () => {
     refreshReviews();
   };
 
+  const [editingName, setEditingName] = useState<{ id: string; value: string } | null>(null);
+
+  const saveReviewName = async () => {
+    if (!editingName) return;
+    const value = editingName.value.trim();
+    if (!value) return;
+    await supabase.from('testimonials').update({ author_name: value }).eq('id', editingName.id);
+    setEditingName(null);
+    refreshReviews();
+  };
+
+
   /* ---------------- Conținut ---------------- */
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
