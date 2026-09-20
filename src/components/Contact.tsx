@@ -24,6 +24,10 @@ import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [website, setWebsite] = useState(''); // honeypot – invisible to real users
+  const formLoadedAt = useRef(Date.now());
+  const lastSentAt = useRef<number>(0);
+
   const { toast } = useToast();
   const { t } = useSiteContent();
 
