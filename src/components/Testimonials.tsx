@@ -106,7 +106,8 @@ const Testimonials = () => {
   const items = data ?? [];
   if (items.length === 0) return null;
 
-  const visible = showAll ? items : items.slice(0, 4);
+  const visible = items.slice(0, visibleCount);
+  const remaining = items.length - visible.length;
 
   return (
     <section id="testimoniale" className="section-spacing bg-gradient-to-b from-background to-secondary/20">
