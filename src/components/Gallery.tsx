@@ -134,9 +134,7 @@ const Gallery = () => {
                     className="relative overflow-hidden"
                     style={{
                       aspectRatio:
-                        item.type === 'image' && item.width && item.height
-                          ? `${item.width} / ${item.height}`
-                          : '1 / 1',
+                        item.width && item.height ? `${item.width} / ${item.height}` : '1 / 1',
                     }}
                   >
                     {item.type === 'image' ? (
@@ -151,7 +149,16 @@ const Gallery = () => {
                       />
                     ) : (
                       <div className="relative w-full h-full bg-gradient-to-br from-purple-900 to-black flex items-center justify-center">
-                        <div className="bg-neon-cyan/20 rounded-full p-4 backdrop-blur-sm">
+                        {item.thumb_path && item.thumbUrl ? (
+                          <img
+                            src={item.thumbUrl}
+                            alt={item.title}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : null}
+                        <div className="relative bg-neon-cyan/20 rounded-full p-4 backdrop-blur-sm">
                           <Play className="w-12 h-12 text-neon-cyan fill-current" />
                         </div>
                         <div className="absolute top-2 right-2">
