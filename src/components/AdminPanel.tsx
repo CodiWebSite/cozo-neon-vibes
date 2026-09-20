@@ -289,6 +289,29 @@ const AdminPanel = () => {
     },
   });
 
+  const reorderGallery = async (orderedIds: string[]) => {
+    queryClient.setQueryData(['admin_gallery'], (prev: unknown) => {
+      if (!Array.isArray(prev)) return prev;
+      const byId = new Map(prev.map((row) => [(row as { id: string }).id, row]));
+      return orderedIds.map((id, index) => ({ ...(byId.get(id) as object), sort_order: index }));
+    });
+
+    const results = await Promise.all(
+      orderedIds.map((id, index) =>
+        supabase.from('gallery_items').update({ sort_order: index }).eq('id', id),
+      ),
+    );
+    const failed = results.find((r) => r.error);
+    if (failed?.error) {
+      toast({
+        title: 'Nu am putut salva ordinea',
+        description: failed.error.message,
+        variant: 'destructive',
+      });
+    }
+    refreshGallery();
+  };
+
   const updateGalleryItem = async (id: string, patch: { title?: string; category?: string }) => {
     const { error } = await supabase.from('gallery_items').update(patch).eq('id', id);
     if (error) {
@@ -842,6 +865,11 @@ const AdminPanel = () => {
                       )}
                       Încarcă {pendingCount > 0 ? `(${pendingCount})` : ''}
                     </Button>
+                    {failedCount > 0 && (
+                      <Button variant="outline" onClick={retryFailed} disabled={uploading}>
+                        <RefreshCw className="w-4 h-4 mr-2" /> Reîncearcă eșuate ({failedCount})
+                      </Button>
+                    )}
                     <Button variant="ghost" onClick={clearFinished} disabled={uploading}>
                       Curăță lista
                     </Button>
