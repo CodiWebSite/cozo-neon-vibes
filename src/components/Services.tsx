@@ -88,54 +88,6 @@ const Services = () => {
     }
   ];
 
-  const fetchServices = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/services.php');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch services');
-      }
-      
-      const data = await response.json();
-      
-      if (Array.isArray(data) && data.length > 0) {
-        // Convertim path-urile imaginilor pentru a folosi imaginile locale
-        const servicesWithImages = data.map(service => ({
-          ...service,
-          image: getServiceImage(service.image)
-        }));
-        setServices(servicesWithImages);
-        setError(null);
-      } else {
-        // Folosim serviciile implicite dacă API-ul nu returnează date
-        setServices(defaultServices);
-      }
-    } catch (err) {
-      console.error('Error fetching services:', err);
-      setError('Failed to load services - Se afișează serviciile implicite');
-      setServices(defaultServices);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getServiceImage = (imagePath: string) => {
-    // Mapăm path-urile din API la imaginile locale
-    const imageMap: { [key: string]: string } = {
-      '/src/assets/wedding-dj.jpg': weddingImage,
-      '/src/assets/corporate-event.jpg': corporateImage,
-      '/src/assets/club-night.jpg': clubImage,
-      '/src/assets/private-party.jpg': privateImage
-    };
-    
-    return imageMap[imagePath] || imagePath;
-  };
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact');
     if (contactSection) {
@@ -143,20 +95,6 @@ const Services = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <section id="services" className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-4" />
-              <p className="text-gray-300">Se încarcă serviciile...</p>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section id="services" className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
