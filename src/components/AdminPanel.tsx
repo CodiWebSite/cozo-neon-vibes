@@ -82,6 +82,8 @@ const AdminPanel = () => {
   const [category, setCategory] = useState('general');
   const [newCategory, setNewCategory] = useState('');
   const [savingCategories, setSavingCategories] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [editCategoryValue, setEditCategoryValue] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoTitle, setVideoTitle] = useState('');
   const [dragOver, setDragOver] = useState(false);
