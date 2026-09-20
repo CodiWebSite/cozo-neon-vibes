@@ -298,6 +298,71 @@ const AdminPanel = () => {
     },
   });
 
+  const categoriesQuery = useQuery({
+    queryKey: ['gallery_categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('content_value')
+        .eq('content_key', CATEGORIES_KEY)
+        .maybeSingle();
+      if (error) throw error;
+      const parsed = parseCategories(data?.content_value);
+      return parsed.length ? parsed : DEFAULT_CATEGORIES;
+    },
+  });
+
+  const categories = categoriesQuery.data ?? DEFAULT_CATEGORIES;
+
+  const saveCategories = async (list: string[]) => {
+    setSavingCategories(true);
+    const value = list.join('\n');
+    const { error } = await supabase
+      .from('site_content')
+      .upsert(
+        { content_key: CATEGORIES_KEY, content_value: value, label: 'Categorii galerie', section: 'Galerie' },
+        { onConflict: 'content_key' },
+      );
+    setSavingCategories(false);
+    if (error) {
+      toast({ title: 'Nu am putut salva categoriile', description: error.message, variant: 'destructive' });
+      return false;
+    }
+    queryClient.invalidateQueries({ queryKey: ['gallery_categories'] });
+    queryClient.invalidateQueries({ queryKey: ['admin_site_content'] });
+    queryClient.invalidateQueries({ queryKey: ['site_content'] });
+    return true;
+  };
+
+  const addCategory = async () => {
+    const name = newCategory.trim().toLowerCase();
+    if (!name) return;
+    if (categories.includes(name)) {
+      toast({ title: 'Categoria există deja' });
+      return;
+    }
+    const ok = await saveCategories([...categories, name]);
+    if (ok) {
+      setNewCategory('');
+      setCategory(name);
+      toast({ title: `Categoria „${name}" a fost adăugată` });
+    }
+  };
+
+  const removeCategory = async (name: string) => {
+    const used = (galleryQuery.data ?? []).some((item) => item.category === name);
+    if (used) {
+      toast({
+        title: 'Categoria este folosită',
+        description: 'Mută întâi pozele/clipurile în altă categorie, apoi o poți șterge.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    const ok = await saveCategories(categories.filter((c) => c !== name));
+    if (ok && category === name) setCategory('general');
+  };
+
   const reorderGallery = async (orderedIds: string[]) => {
     queryClient.setQueryData(['admin_gallery'], (prev: unknown) => {
       if (!Array.isArray(prev)) return prev;
