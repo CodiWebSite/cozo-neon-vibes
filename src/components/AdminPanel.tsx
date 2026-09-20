@@ -260,8 +260,22 @@ const AdminPanel = () => {
     setSyncing(true);
     try {
       const { data, error } = await supabase.functions.invoke('sync-facebook-reviews', { body: {} });
-      if (error) throw error;
+      if (error) {
+        // Citim mesajul real returnat de funcție (invoke ascunde corpul răspunsului)
+        let detail = '';
+        const res = (error as { context?: Response }).context;
+        if (res && typeof res.json === 'function') {
+          try {
+            const body = await res.json();
+            detail = (body as { error?: string })?.error ?? '';
+          } catch {
+            detail = '';
+          }
+        }
+        throw new Error(detail || error.message);
+      }
       if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+
       const result = data as { fetched: number; imported: number };
       toast({
         title: 'Sincronizare reușită',
