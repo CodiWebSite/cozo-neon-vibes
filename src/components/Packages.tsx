@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, Star, Zap, Crown, Package, Loader2 } from 'lucide-react';
+import { Check, Star, Zap, Crown, Package } from 'lucide-react';
 import { useSiteContent } from '@/hooks/useSiteContent';
 
 interface PackageItem {
@@ -14,15 +14,68 @@ interface PackageItem {
   features: string[];
   popular: boolean;
   gradient: string;
-  created_at: string;
-  updated_at: string;
 }
+
+
+const DEFAULT_PACKAGES: PackageItem[] = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    icon: 'Zap',
+    duration: '6 ore',
+    description: 'Perfect pentru petreceri mici și evenimente private',
+    features: [
+      'Echipament DJ profesional',
+      'Repertoriu standard',
+      'Mixing live 6 ore',
+      'Sisteme audio de bază',
+      'Suport tehnic',
+    ],
+    popular: false,
+    gradient: 'from-blue-500 to-cyan-500',
+  },
+  {
+    id: 'professional',
+    name: 'Professional',
+    icon: 'Star',
+    duration: '8 ore',
+    description: 'Cel mai popular pachet pentru nunți și evenimente corporate',
+    features: [
+      'Echipament premium',
+      'Repertoriu extins personalizat',
+      'Mixing live 8 ore',
+      'Sisteme audio profesionale',
+      'Iluminat de bază',
+      'Coordonare cu fotograful',
+      'Backup complet echipament',
+    ],
+    popular: true,
+    gradient: 'from-purple-500 to-violet-500',
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    icon: 'Crown',
+    duration: '8-10 ore',
+    description: 'Experiență completă cu toate serviciile incluse',
+    features: [
+      'Echipament top premium',
+      'Repertoriu nelimitat',
+      'Mixing live 8-10 ore',
+      'Sisteme audio high-end',
+      'Show de lumini complet',
+      'Coordonare completă eveniment',
+      'Efecte speciale',
+      'Consultanță muzicală',
+    ],
+    popular: false,
+    gradient: 'from-amber-500 to-orange-500',
+  },
+];
 
 const Packages = () => {
   const { t } = useSiteContent();
-  const [packages, setPackages] = useState<PackageItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const packages = DEFAULT_PACKAGES;
 
   // Mapare iconuri
   const iconMap: { [key: string]: React.ComponentType<any> } = {
@@ -32,101 +85,6 @@ const Packages = () => {
     'Package': Package,
   };
 
-  // Fetch packages from API
-  const fetchPackages = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/packages.php');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch packages');
-      }
-      
-      const data = await response.json();
-      
-      // API-ul returnează direct un array de pachete
-      if (Array.isArray(data)) {
-        setPackages(data);
-        setError(null);
-      } else {
-        throw new Error('Invalid response format');
-      }
-    } catch (err) {
-      console.error('Error fetching packages:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load packages');
-      
-      // Fallback la datele statice în caz de eroare
-      setPackages([
-        {
-          id: '1',
-          name: "Starter",
-          icon: "Zap",
-          duration: "4 ore",
-          description: "Perfect pentru petreceri mici și evenimente private",
-          features: [
-            "Echipament DJ profesional",
-            "Repertoriu standard",
-            "Mixing live 4 ore",
-            "Sisteme audio de bază",
-            "Suport tehnic"
-          ],
-          popular: false,
-          gradient: "from-blue-500 to-cyan-500",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: "Professional",
-          icon: "Star",
-          duration: "6 ore",
-          description: "Cel mai popular pachet pentru nunți și evenimente corporate",
-          features: [
-            "Echipament premium",
-            "Repertoriu extins personalizat",
-            "Mixing live 6 ore",
-            "Sisteme audio profesionale",
-            "Iluminat de bază",
-            "Coordonare cu fotograful",
-            "Backup complet echipament"
-          ],
-          popular: true,
-          gradient: "from-purple-500 to-violet-500",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: '3',
-          name: "Premium",
-          icon: "Crown",
-          duration: "8 ore",
-          description: "Experiență completă cu toate serviciile incluse",
-          features: [
-            "Echipament top premium",
-            "Repertoriu nelimitat",
-            "Mixing live 8 ore",
-            "Sisteme audio high-end",
-            "Show de lumini complet",
-            "DJ backup disponibil",
-            "Coordonare completă eveniment",
-            "Efecte speciale",
-            "Consultanță muzicală"
-          ],
-          popular: false,
-          gradient: "from-amber-500 to-orange-500",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
   const scrollToContact = () => {
     const element = document.getElementById('contact');
     if (element) {
@@ -134,29 +92,6 @@ const Packages = () => {
     }
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <section id="pachete" className="section-spacing bg-gradient-to-b from-secondary/20 to-background">
-        <div className="container-custom">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <Badge variant="outline" className="neon-border text-primary mb-4">
-              Pachete Disponibile
-            </Badge>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6">
-              Alege <span className="gradient-text">Pachetul</span> Perfect
-            </h2>
-          </div>
-          <div className="flex justify-center items-center py-20">
-            <div className="flex items-center space-x-3">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              <span className="text-lg text-muted-foreground">Se încarcă pachetele...</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section id="pachete" className="section-spacing bg-gradient-to-b from-secondary/20 to-background">
@@ -173,13 +108,6 @@ const Packages = () => {
             Pachete complete adaptate pentru orice tip de eveniment. 
             Servicii profesionale cu echipament, transport și setup inclus.
           </p>
-          {error && (
-            <div className="mt-4 p-3 bg-red-900/20 border border-red-700/50 rounded-lg">
-              <p className="text-red-400 text-sm">
-                {error} - Se afișează pachetele implicite.
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Packages Grid */}
