@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect, lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import CookieBanner from "./components/CookieBanner";
+import PageMeta from "./components/PageMeta";
 import LoadingScreen from "./components/LoadingScreen";
 import BackToTop from "./components/BackToTop";
 import { useCookieConsent } from "./hooks/use-cookie-consent";
@@ -60,10 +61,49 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/politici" element={<PrivacyPolicy />} />
-                <Route path="/admin/invitatie" element={<AdminInvite />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route
+                  path="/admin/invitatie"
+                  element={
+                    <>
+                      <PageMeta
+                        title="Invitație administrator | DJ Cozo"
+                        description="Acceptă invitația de administrator și creează-ți parola pentru panoul de administrare DJ Cozo."
+                        url="https://dj-cozo.ro/admin/invitatie"
+                        noIndex
+                      />
+                      <AdminInvite />
+                    </>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <>
+                      <PageMeta
+                        title="Acces Admin | DJ Cozo"
+                        description="Zonă privată de administrare a site-ului DJ Cozo: galerie, texte, mesaje și recenzii."
+                        url="https://dj-cozo.ro/admin"
+                        noIndex
+                      />
+                      <Admin />
+                    </>
+                  }
+                />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
+                <Route
+                  path="*"
+                  element={
+                    <>
+                      <PageMeta
+                        title="Pagina nu a fost găsită | DJ Cozo"
+                        description="Pagina căutată nu există. Întoarce-te la pagina principală DJ Cozo — DJ pentru nunți și evenimente în Iași."
+                        url="https://dj-cozo.ro/404"
+                        noIndex
+                      />
+                      <NotFound />
+                    </>
+                  }
+                />
               </Routes>
             </Suspense>
 
