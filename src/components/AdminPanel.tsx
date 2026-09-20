@@ -58,7 +58,14 @@ interface QueueItem {
   attempt?: number;
 }
 
-const CATEGORIES = ['nunti', 'corporate', 'club', 'private', 'general'];
+const DEFAULT_CATEGORIES = ['nunti', 'corporate', 'club', 'private', 'general'];
+const CATEGORIES_KEY = 'gallery_categories';
+
+const parseCategories = (raw: string | null | undefined) =>
+  (raw ?? '')
+    .split('\n')
+    .map((c) => c.trim())
+    .filter(Boolean);
 
 const AdminPanel = () => {
   const { toast } = useToast();
