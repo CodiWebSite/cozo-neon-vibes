@@ -673,11 +673,58 @@ const AdminPanel = () => {
                 <p className="text-sm text-muted-foreground mt-1">
                   Poți selecta oricâte deodată. Pozele sunt optimizate automat (WebP) ca site-ul să rămână rapid.
                 </p>
+                <div className="flex flex-wrap justify-center gap-3 mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      photoInputRef.current?.click();
+                    }}
+                  >
+                    Alege poze
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      videoInputRef.current?.click();
+                    }}
+                  >
+                    Alege clipuri
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  Pe telefon, ține apăsat pe prima poză și apoi bifează-le pe toate.
+                </p>
                 <input
                   ref={fileInputRef}
                   type="file"
                   multiple
                   accept="image/*,video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files) addFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files) addFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  multiple
+                  accept="video/*"
                   className="hidden"
                   onChange={(e) => {
                     if (e.target.files) addFiles(e.target.files);
