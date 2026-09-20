@@ -15,10 +15,10 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const navLinks = [
-    { id: 'despre', label: 'Despre' },
-    { id: 'servicii', label: 'Servicii' },
+    { id: 'about', label: 'Despre' },
+    { id: 'services', label: 'Servicii' },
     { id: 'pachete', label: 'Pachete' },
-    { id: 'galerie', label: 'Galerie' },
+    { id: 'gallery', label: 'Galerie' },
     { id: 'testimoniale', label: 'Testimoniale' },
     { id: 'contact', label: 'Contact' },
   ];

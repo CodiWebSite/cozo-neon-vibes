@@ -134,9 +134,7 @@ const Gallery = () => {
                     className="relative overflow-hidden"
                     style={{
                       aspectRatio:
-                        item.type === 'image' && item.width && item.height
-                          ? `${item.width} / ${item.height}`
-                          : '1 / 1',
+                        item.width && item.height ? `${item.width} / ${item.height}` : '1 / 1',
                     }}
                   >
                     {item.type === 'image' ? (
@@ -151,7 +149,16 @@ const Gallery = () => {
                       />
                     ) : (
                       <div className="relative w-full h-full bg-gradient-to-br from-purple-900 to-black flex items-center justify-center">
-                        <div className="bg-neon-cyan/20 rounded-full p-4 backdrop-blur-sm">
+                        {item.thumb_path && item.thumbUrl ? (
+                          <img
+                            src={item.thumbUrl}
+                            alt={item.title}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : null}
+                        <div className="relative bg-neon-cyan/20 rounded-full p-4 backdrop-blur-sm">
                           <Play className="w-12 h-12 text-neon-cyan fill-current" />
                         </div>
                         <div className="absolute top-2 right-2">
@@ -199,18 +206,17 @@ const Gallery = () => {
                   <ChevronRight className="w-6 h-6" />
                 </button>
 
-                <div className="w-full h-full flex items-center justify-center p-8">
+                <div className="w-full h-full flex items-center justify-center px-6 pt-12 pb-28 overflow-hidden">
                   {galleryItems[selectedItem].type === 'image' ? (
                     <img
                       src={galleryItems[selectedItem].displayUrl ?? ''}
                       alt={galleryItems[selectedItem].title}
-                      className="max-w-full max-h-full object-contain"
+                      className="max-w-full max-h-full w-auto h-auto object-contain"
                     />
                   ) : isEmbed(galleryItems[selectedItem].video_url) ? (
                     <iframe
                       src={galleryItems[selectedItem].video_url ?? ''}
-                      className="w-full h-full rounded-lg"
-                      style={{ minHeight: '500px' }}
+                      className="w-full h-full max-h-full rounded-lg"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                       title={galleryItems[selectedItem].title}
@@ -218,8 +224,14 @@ const Gallery = () => {
                   ) : (
                     <video
                       src={galleryItems[selectedItem].displayUrl ?? ''}
+                      poster={
+                        galleryItems[selectedItem].thumb_path
+                          ? galleryItems[selectedItem].thumbUrl ?? undefined
+                          : undefined
+                      }
                       controls
-                      className="max-w-full max-h-full rounded-lg"
+                      playsInline
+                      className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg"
                     />
                   )}
                 </div>

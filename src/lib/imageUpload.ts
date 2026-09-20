@@ -71,3 +71,61 @@ export const formatBytes = (bytes: number) => {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
+
+export interface PreparedVideoPoster {
+  thumb: Blob;
+  width: number;
+  height: number;
+}
+
+/** Extrage un cadru din video și îl transformă în miniatură WebP. */
+export const prepareVideoPoster = (file: File): Promise<PreparedVideoPoster> =>
+  new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    (video as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
+    video.crossOrigin = 'anonymous';
+
+    const cleanup = () => URL.revokeObjectURL(url);
+    const fail = (message: string) => {
+      cleanup();
+      reject(new Error(message));
+    };
+
+    video.onloadedmetadata = () => {
+      const target = Math.min(1, Math.max(0.1, video.duration * 0.15));
+      video.currentTime = Number.isFinite(target) ? target : 0.1;
+    };
+
+    video.onseeked = () => {
+      try {
+        const sw = video.videoWidth;
+        const sh = video.videoHeight;
+        const scale = Math.min(1, MAX_THUMB / Math.max(sw, sh));
+        const width = Math.max(1, Math.round(sw * scale));
+        const height = Math.max(1, Math.round(sh * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return fail('Canvas indisponibil');
+        ctx.drawImage(video, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            cleanup();
+            if (!blob) return reject(new Error('Miniatură eșuată'));
+            resolve({ thumb: blob, width: sw, height: sh });
+          },
+          'image/webp',
+          0.72,
+        );
+      } catch {
+        fail('Nu am putut extrage cadrul video');
+      }
+    };
+
+    video.onerror = () => fail('Video ilizibil');
+    video.src = url;
+  });
