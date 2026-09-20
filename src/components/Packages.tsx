@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, Star, Zap, Crown, Package, Loader2 } from 'lucide-react';
+import { Check, Star, Zap, Crown, Package } from 'lucide-react';
 import { useSiteContent } from '@/hooks/useSiteContent';
 
 interface PackageItem {
@@ -14,9 +14,8 @@ interface PackageItem {
   features: string[];
   popular: boolean;
   gradient: string;
-  created_at: string;
-  updated_at: string;
 }
+
 
 const DEFAULT_PACKAGES: PackageItem[] = [
   {
