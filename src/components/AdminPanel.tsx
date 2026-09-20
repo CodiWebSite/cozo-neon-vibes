@@ -16,7 +16,7 @@ import { uploadWithProgress, withRetry } from '@/lib/uploadWithProgress';
 import SortableGalleryGrid from '@/components/admin/SortableGalleryGrid';
 import {
   Loader2, Trash2, Upload, LogOut, Save, Mail, ExternalLink,
-  ImagePlus, Link2, RefreshCw, Star, Eye, EyeOff, Plus, CheckCircle2, XCircle,
+  ImagePlus, Link2, RefreshCw, Star, Eye, EyeOff, Plus, CheckCircle2, XCircle, Pencil,
 } from 'lucide-react';
 
 interface ContactMessage {
@@ -82,6 +82,8 @@ const AdminPanel = () => {
   const [category, setCategory] = useState('general');
   const [newCategory, setNewCategory] = useState('');
   const [savingCategories, setSavingCategories] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [editCategoryValue, setEditCategoryValue] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoTitle, setVideoTitle] = useState('');
   const [dragOver, setDragOver] = useState(false);
@@ -350,6 +352,14 @@ const AdminPanel = () => {
   };
 
   const removeCategory = async (name: string) => {
+    if (name === 'general') {
+      toast({
+        title: 'Categoria „general" nu poate fi ștearsă',
+        description: 'Este categoria de rezervă pentru poze și clipuri.',
+        variant: 'destructive',
+      });
+      return;
+    }
     const used = (galleryQuery.data ?? []).some((item) => item.category === name);
     if (used) {
       toast({
@@ -361,6 +371,31 @@ const AdminPanel = () => {
     }
     const ok = await saveCategories(categories.filter((c) => c !== name));
     if (ok && category === name) setCategory('general');
+    if (ok) toast({ title: `Categoria „${name}" a fost ștearsă` });
+  };
+
+  const renameCategory = async (oldName: string, rawName: string) => {
+    const name = rawName.trim().toLowerCase();
+    setEditingCategory(null);
+    if (!name || name === oldName) return;
+    if (categories.includes(name)) {
+      toast({ title: 'Există deja o categorie cu acest nume', variant: 'destructive' });
+      return;
+    }
+    const ok = await saveCategories(categories.map((c) => (c === oldName ? name : c)));
+    if (!ok) return;
+
+    const { error } = await supabase
+      .from('gallery_items')
+      .update({ category: name })
+      .eq('category', oldName);
+    if (error) {
+      toast({ title: 'Nu am putut muta pozele în categoria redenumită', description: error.message, variant: 'destructive' });
+      return;
+    }
+    refreshGallery();
+    if (category === oldName) setCategory(name);
+    toast({ title: `Categoria se numește acum „${name}"` });
   };
 
   const reorderGallery = async (orderedIds: string[]) => {
@@ -777,32 +812,79 @@ const AdminPanel = () => {
               <div className="space-y-3">
                 <label className="text-sm font-medium text-foreground">Categorie pentru încărcare</label>
                 <div className="flex flex-wrap gap-2">
-                  {categories.map((c) => (
-                    <Badge
-                      key={c}
-                      onClick={() => setCategory(c)}
-                      className={`cursor-pointer group gap-1 ${
-                        category === c
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-secondary text-muted-foreground'
-                      }`}
-                    >
-                      {c}
-                      {!DEFAULT_CATEGORIES.includes(c) && (
+                  {categories.map((c) =>
+                    editingCategory === c ? (
+                      <span key={c} className="flex items-center gap-1">
+                        <Input
+                          autoFocus
+                          value={editCategoryValue}
+                          onChange={(e) => setEditCategoryValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              renameCategory(c, editCategoryValue);
+                            }
+                            if (e.key === 'Escape') setEditingCategory(null);
+                          }}
+                          className="h-8 w-40"
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8"
+                          disabled={savingCategories}
+                          onClick={() => renameCategory(c, editCategoryValue)}
+                        >
+                          Salvează
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8"
+                          onClick={() => setEditingCategory(null)}
+                        >
+                          Renunță
+                        </Button>
+                      </span>
+                    ) : (
+                      <Badge
+                        key={c}
+                        onClick={() => setCategory(c)}
+                        className={`cursor-pointer group gap-1 ${
+                          category === c
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-muted-foreground'
+                        }`}
+                      >
+                        {c}
                         <button
                           type="button"
-                          aria-label={`Șterge categoria ${c}`}
+                          aria-label={`Redenumește categoria ${c}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            removeCategory(c);
+                            setEditingCategory(c);
+                            setEditCategoryValue(c);
                           }}
                           className="opacity-70 hover:opacity-100"
                         >
-                          <XCircle className="w-3 h-3" />
+                          <Pencil className="w-3 h-3" />
                         </button>
-                      )}
-                    </Badge>
-                  ))}
+                        {c !== 'general' && (
+                          <button
+                            type="button"
+                            aria-label={`Șterge categoria ${c}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeCategory(c);
+                            }}
+                            className="opacity-70 hover:opacity-100"
+                          >
+                            <XCircle className="w-3 h-3" />
+                          </button>
+                        )}
+                      </Badge>
+                    ),
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
                   <Input
