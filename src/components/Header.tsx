@@ -29,7 +29,7 @@ const Header = () => {
     { id: 'services', label: 'Servicii' },
     { id: 'pachete', label: 'Pachete' },
     { id: 'gallery', label: 'Galerie' },
-    { id: 'testimoniale', label: 'Testimoniale' },
+    { id: 'testimoniale', label: 'Recenzii' },
     { id: 'contact', label: 'Contact' },
   ];
 
