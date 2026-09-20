@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +51,18 @@ const Gallery = () => {
   };
 
   const isEmbed = (url: string | null) => !!url && /^https?:\/\//i.test(url);
+
+  // Navigare din tastatură în lightbox
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') nextItem();
+      if (e.key === 'ArrowLeft') prevItem();
+      if (e.key === 'Escape') closeLightbox();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
 
   return (
     <section id="gallery" className="py-20 bg-black">
@@ -110,20 +122,31 @@ const Gallery = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
               {galleryItems.map((item, index) => (
                 <Card
                   key={item.id}
-                  className="group cursor-pointer overflow-hidden bg-gray-900 border-gray-800 hover:border-neon-cyan transition-all duration-300"
+                  className="group cursor-pointer overflow-hidden bg-gray-900 border-gray-800 hover:border-neon-cyan transition-all duration-300 mb-6 break-inside-avoid"
                   onClick={() => openLightbox(index)}
                 >
-                  <div className="relative aspect-square overflow-hidden">
+                  <div
+                    className="relative overflow-hidden"
+                    style={{
+                      aspectRatio:
+                        item.type === 'image' && item.width && item.height
+                          ? `${item.width} / ${item.height}`
+                          : '1 / 1',
+                    }}
+                  >
                     {item.type === 'image' ? (
                       <img
-                        src={item.displayUrl ?? ''}
+                        src={item.thumbUrl ?? item.displayUrl ?? ''}
                         alt={item.title}
                         loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        decoding="async"
+                        width={item.width ?? undefined}
+                        height={item.height ?? undefined}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="relative w-full h-full bg-gradient-to-br from-purple-900 to-black flex items-center justify-center">

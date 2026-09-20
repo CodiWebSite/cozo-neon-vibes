@@ -22,6 +22,27 @@
       "when": 1789901615902,
       "tag": "0002_tighten_function_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789901685835,
+      "tag": "0003_testimonials_and_gallery_media",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789901979910,
+      "tag": "0004_schedule_facebook_reviews_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789901991918,
+      "tag": "0005_fix_cron_auth_header",
+      "breakpoints": true
     }
   ]
 }

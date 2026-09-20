@@ -54,38 +54,47 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          height: number | null
           id: string
           sort_order: number
           src: string | null
+          thumb_path: string | null
           thumbnail: string | null
           title: string
           type: string
           updated_at: string
           video_url: string | null
+          width: number | null
         }
         Insert: {
           category?: string
           created_at?: string
+          height?: number | null
           id?: string
           sort_order?: number
           src?: string | null
+          thumb_path?: string | null
           thumbnail?: string | null
           title?: string
           type?: string
           updated_at?: string
           video_url?: string | null
+          width?: number | null
         }
         Update: {
           category?: string
           created_at?: string
+          height?: number | null
           id?: string
           sort_order?: number
           src?: string | null
+          thumb_path?: string | null
           thumbnail?: string | null
           title?: string
           type?: string
           updated_at?: string
           video_url?: string | null
+          width?: number | null
         }
         Relationships: []
       }
@@ -109,6 +118,60 @@ export type Database = {
           content_value?: string
           label?: string
           section?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          content: string
+          created_at: string
+          external_id: string | null
+          id: string
+          is_visible: boolean
+          permalink: string | null
+          rating: number | null
+          recommendation_type: string | null
+          reviewed_at: string | null
+          role: string | null
+          sort_order: number
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name: string
+          content: string
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          is_visible?: boolean
+          permalink?: string | null
+          rating?: number | null
+          recommendation_type?: string | null
+          reviewed_at?: string | null
+          role?: string | null
+          sort_order?: number
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          content?: string
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          is_visible?: boolean
+          permalink?: string | null
+          rating?: number | null
+          recommendation_type?: string | null
+          reviewed_at?: string | null
+          role?: string | null
+          sort_order?: number
+          source?: string
           updated_at?: string
         }
         Relationships: []

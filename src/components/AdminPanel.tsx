@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -6,10 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { resolveGalleryItems, type GalleryRow } from '@/lib/galleryUrls';
-import { Loader2, Trash2, Upload, LogOut, Save, Mail, ExternalLink } from 'lucide-react';
+import { prepareImage, formatBytes } from '@/lib/imageUpload';
+import {
+  Loader2, Trash2, Upload, LogOut, Save, Mail, ExternalLink,
+  ImagePlus, Link2, RefreshCw, Star, Eye, EyeOff, Plus, CheckCircle2, XCircle,
+} from 'lucide-react';
 
 interface ContactMessage {
   id: string;
@@ -23,16 +29,174 @@ interface ContactMessage {
   created_at: string;
 }
 
+interface TestimonialRow {
+  id: string;
+  source: string;
+  author_name: string;
+  author_avatar: string | null;
+  role: string | null;
+  content: string;
+  rating: number | null;
+  recommendation_type: string | null;
+  permalink: string | null;
+  reviewed_at: string | null;
+  is_visible: boolean;
+  sort_order: number;
+}
+
+type QueueStatus = 'pending' | 'working' | 'done' | 'error';
+
+interface QueueItem {
+  id: string;
+  file: File;
+  preview: string;
+  status: QueueStatus;
+  progress: number;
+  error?: string;
+}
+
+const CATEGORIES = ['nunti', 'corporate', 'club', 'private', 'general'];
+
 const AdminPanel = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  /* ---------------- Galerie ---------------- */
+  const refreshGallery = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin_gallery'] });
+    queryClient.invalidateQueries({ queryKey: ['gallery_items'] });
+  };
+
+  /* ---------------- Galerie: încărcare multiplă ---------------- */
+  const [queue, setQueue] = useState<QueueItem[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [title, setTitle] = useState('');
   const [category, setCategory] = useState('general');
   const [videoUrl, setVideoUrl] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [videoTitle, setVideoTitle] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const addFiles = useCallback((files: FileList | File[]) => {
+    const accepted = Array.from(files).filter(
+      (f) => f.type.startsWith('image/') || f.type.startsWith('video/'),
+    );
+    if (accepted.length === 0) return;
+    setQueue((prev) => [
+      ...prev,
+      ...accepted.map((file) => ({
+        id: crypto.randomUUID(),
+        file,
+        preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
+        status: 'pending' as QueueStatus,
+        progress: 0,
+      })),
+    ]);
+  }, []);
+
+  const removeFromQueue = (id: string) =>
+    setQueue((prev) => prev.filter((item) => item.id !== id));
+
+  const uploadAll = async () => {
+    const pending = queue.filter((item) => item.status === 'pending' || item.status === 'error');
+    if (pending.length === 0) return;
+    setUploading(true);
+
+    const setItem = (id: string, patch: Partial<QueueItem>) =>
+      setQueue((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
+
+    let ok = 0;
+    for (const item of pending) {
+      setItem(item.id, { status: 'working', progress: 10, error: undefined });
+      try {
+        const isVideo = item.file.type.startsWith('video/');
+        const base = crypto.randomUUID();
+
+        if (isVideo) {
+          const ext = item.file.name.split('.').pop() ?? 'mp4';
+          const path = `${base}.${ext}`;
+          setItem(item.id, { progress: 40 });
+          const { error } = await supabase.storage.from('gallery').upload(path, item.file, {
+            cacheControl: '31536000',
+            contentType: item.file.type,
+          });
+          if (error) throw error;
+          setItem(item.id, { progress: 80 });
+          const { error: dbError } = await supabase.from('gallery_items').insert({
+            title: item.file.name.replace(/\.[^.]+$/, ''),
+            category,
+            type: 'video',
+            video_url: path,
+          });
+          if (dbError) throw dbError;
+        } else {
+          setItem(item.id, { progress: 25 });
+          const prepared = await prepareImage(item.file);
+          setItem(item.id, { progress: 45 });
+
+          const fullPath = `${base}.webp`;
+          const thumbPath = `${base}-thumb.webp`;
+
+          const up1 = await supabase.storage.from('gallery').upload(fullPath, prepared.full, {
+            cacheControl: '31536000',
+            contentType: 'image/webp',
+          });
+          if (up1.error) throw up1.error;
+          setItem(item.id, { progress: 70 });
+
+          const up2 = await supabase.storage.from('gallery').upload(thumbPath, prepared.thumb, {
+            cacheControl: '31536000',
+            contentType: 'image/webp',
+          });
+          if (up2.error) throw up2.error;
+          setItem(item.id, { progress: 90 });
+
+          const { error: dbError } = await supabase.from('gallery_items').insert({
+            title: item.file.name.replace(/\.[^.]+$/, ''),
+            category,
+            type: 'image',
+            src: fullPath,
+            thumb_path: thumbPath,
+            width: prepared.width,
+            height: prepared.height,
+          });
+          if (dbError) throw dbError;
+        }
+
+        setItem(item.id, { status: 'done', progress: 100 });
+        ok++;
+      } catch (error) {
+        setItem(item.id, {
+          status: 'error',
+          progress: 0,
+          error: error instanceof Error ? error.message : 'Eroare',
+        });
+      }
+    }
+
+    setUploading(false);
+    refreshGallery();
+    if (ok > 0) toast({ title: `${ok} fișiere adăugate în galerie` });
+  };
+
+  const clearFinished = () =>
+    setQueue((prev) => prev.filter((item) => item.status !== 'done'));
+
+  const addVideoLink = async () => {
+    if (!videoUrl.trim()) return;
+    const { error } = await supabase.from('gallery_items').insert({
+      title: videoTitle.trim() || 'Video',
+      category,
+      type: 'video',
+      video_url: videoUrl.trim(),
+    });
+    if (error) {
+      toast({ title: 'Nu am putut adăuga', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setVideoUrl('');
+    setVideoTitle('');
+    toast({ title: 'Video adăugat' });
+    refreshGallery();
+  };
 
   const galleryQuery = useQuery({
     queryKey: ['admin_gallery'],
@@ -40,79 +204,111 @@ const AdminPanel = () => {
       const { data, error } = await supabase
         .from('gallery_items')
         .select('*')
+        .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
       if (error) throw error;
       return resolveGalleryItems((data ?? []) as GalleryRow[]);
     },
   });
 
-  const handleUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file && !videoUrl.trim()) {
-      toast({ title: 'Alege o poză sau adaugă un link video', variant: 'destructive' });
+  const updateGalleryItem = async (id: string, patch: { title?: string; category?: string }) => {
+    const { error } = await supabase.from('gallery_items').update(patch).eq('id', id);
+    if (error) {
+      toast({ title: 'Nu am putut salva', description: error.message, variant: 'destructive' });
       return;
     }
-    setUploading(true);
-    try {
-      if (file) {
-        const ext = file.name.split('.').pop() ?? 'jpg';
-        const path = `${crypto.randomUUID()}.${ext}`;
-        const { error: uploadError } = await supabase.storage.from('gallery').upload(path, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
-        if (uploadError) throw uploadError;
-
-        const isVideo = file.type.startsWith('video/');
-        const { error } = await supabase.from('gallery_items').insert({
-          title: title || file.name,
-          category,
-          type: isVideo ? 'video' : 'image',
-          src: isVideo ? null : path,
-          video_url: isVideo ? path : null,
-        });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('gallery_items').insert({
-          title: title || 'Video',
-          category,
-          type: 'video',
-          video_url: videoUrl.trim(),
-        });
-        if (error) throw error;
-      }
-
-      toast({ title: 'Adăugat în galerie' });
-      setTitle('');
-      setVideoUrl('');
-      setFile(null);
-      (document.getElementById('gallery-file') as HTMLInputElement | null)?.value &&
-        ((document.getElementById('gallery-file') as HTMLInputElement).value = '');
-      queryClient.invalidateQueries({ queryKey: ['admin_gallery'] });
-      queryClient.invalidateQueries({ queryKey: ['gallery_items'] });
-    } catch (error: unknown) {
-      toast({
-        title: 'Încărcarea a eșuat',
-        description: error instanceof Error ? error.message : 'Încearcă din nou.',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(false);
-    }
+    refreshGallery();
   };
 
-  const deleteItem = async (id: string, storagePath: string | null) => {
+  const deleteItem = async (id: string, paths: (string | null | undefined)[]) => {
     const { error } = await supabase.from('gallery_items').delete().eq('id', id);
     if (error) {
       toast({ title: 'Nu am putut șterge', description: error.message, variant: 'destructive' });
       return;
     }
-    if (storagePath && !/^https?:\/\//i.test(storagePath)) {
-      await supabase.storage.from('gallery').remove([storagePath]);
-    }
+    const storagePaths = paths.filter(
+      (p): p is string => !!p && !/^https?:\/\//i.test(p),
+    );
+    if (storagePaths.length) await supabase.storage.from('gallery').remove(storagePaths);
     toast({ title: 'Șters din galerie' });
-    queryClient.invalidateQueries({ queryKey: ['admin_gallery'] });
-    queryClient.invalidateQueries({ queryKey: ['gallery_items'] });
+    refreshGallery();
+  };
+
+  /* ---------------- Recenzii ---------------- */
+  const [syncing, setSyncing] = useState(false);
+  const [newReview, setNewReview] = useState({ author_name: '', role: '', content: '', rating: 5 });
+
+  const reviewsQuery = useQuery({
+    queryKey: ['admin_testimonials'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('reviewed_at', { ascending: false, nullsFirst: false });
+      if (error) throw error;
+      return (data ?? []) as TestimonialRow[];
+    },
+  });
+
+  const refreshReviews = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin_testimonials'] });
+    queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+  };
+
+  const syncFacebook = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-facebook-reviews', { body: {} });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      const result = data as { fetched: number; imported: number };
+      toast({
+        title: 'Sincronizare reușită',
+        description: `${result.imported} recenzii aduse de pe Facebook.`,
+      });
+      refreshReviews();
+    } catch (error) {
+      toast({
+        title: 'Sincronizarea nu a reușit',
+        description: error instanceof Error ? error.message : 'Încearcă din nou.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const addReview = async () => {
+    if (!newReview.author_name.trim() || !newReview.content.trim()) {
+      toast({ title: 'Completează numele și textul', variant: 'destructive' });
+      return;
+    }
+    const { error } = await supabase.from('testimonials').insert({
+      source: 'manual',
+      author_name: newReview.author_name.trim(),
+      role: newReview.role.trim() || null,
+      content: newReview.content.trim(),
+      rating: newReview.rating,
+      reviewed_at: new Date().toISOString(),
+    });
+    if (error) {
+      toast({ title: 'Nu am putut adăuga', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setNewReview({ author_name: '', role: '', content: '', rating: 5 });
+    toast({ title: 'Recenzie adăugată' });
+    refreshReviews();
+  };
+
+  const toggleReview = async (item: TestimonialRow) => {
+    await supabase.from('testimonials').update({ is_visible: !item.is_visible }).eq('id', item.id);
+    refreshReviews();
+  };
+
+  const deleteReview = async (id: string) => {
+    await supabase.from('testimonials').delete().eq('id', id);
+    refreshReviews();
   };
 
   /* ---------------- Conținut ---------------- */
@@ -171,6 +367,7 @@ const AdminPanel = () => {
   };
 
   const sections = Array.from(new Set((contentQuery.data ?? []).map((row) => row.section)));
+  const pendingCount = queue.filter((i) => i.status === 'pending' || i.status === 'error').length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,7 +375,7 @@ const AdminPanel = () => {
         <div className="container-custom flex items-center justify-between py-4">
           <div>
             <h1 className="text-xl font-heading font-bold text-foreground">Panou Administrare</h1>
-            <p className="text-sm text-muted-foreground">Gestionează galeria, textele și mesajele</p>
+            <p className="text-sm text-muted-foreground">Galerie, recenzii, texte și mesaje</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => window.open('/', '_blank')}>
@@ -193,8 +390,9 @@ const AdminPanel = () => {
 
       <main className="container-custom py-8">
         <Tabs defaultValue="galerie" className="space-y-6">
-          <TabsList>
+          <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="galerie">Galerie</TabsTrigger>
+            <TabsTrigger value="recenzii">Recenzii</TabsTrigger>
             <TabsTrigger value="continut">Texte site</TabsTrigger>
             <TabsTrigger value="mesaje">
               Mesaje
@@ -208,37 +406,138 @@ const AdminPanel = () => {
 
           {/* GALERIE */}
           <TabsContent value="galerie" className="space-y-6">
-            <Card className="p-6 space-y-4 bg-card/50">
-              <h2 className="text-lg font-heading font-bold text-foreground">Adaugă în galerie</h2>
-              <form onSubmit={handleUpload} className="grid gap-4 md:grid-cols-2">
+            <Card className="p-6 space-y-5 bg-card/50">
+              <div className="flex flex-wrap items-end gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Titlu</label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nuntă la Palas" />
+                  <label className="text-sm font-medium text-foreground">Categorie pentru încărcare</label>
+                  <div className="flex flex-wrap gap-2">
+                    {CATEGORIES.map((c) => (
+                      <Badge
+                        key={c}
+                        onClick={() => setCategory(c)}
+                        className={`cursor-pointer ${
+                          category === c
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-muted-foreground'
+                        }`}
+                      >
+                        {c}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOver(false);
+                  addFiles(e.dataTransfer.files);
+                }}
+                onClick={() => fileInputRef.current?.click()}
+                className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
+                  dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/60'
+                }`}
+              >
+                <ImagePlus className="w-10 h-10 mx-auto mb-3 text-primary" />
+                <p className="font-medium text-foreground">
+                  Trage pozele aici sau apasă pentru a le alege
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Poți selecta oricâte deodată. Pozele sunt optimizate automat (WebP) ca site-ul să rămână rapid.
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files) addFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+              </div>
+
+              {queue.length > 0 && (
+                <div className="space-y-3">
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {queue.map((item) => (
+                      <Card key={item.id} className="overflow-hidden bg-secondary/20">
+                        <div className="aspect-video bg-black/40 flex items-center justify-center overflow-hidden">
+                          {item.preview ? (
+                            <img src={item.preview} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-xs text-muted-foreground">VIDEO</span>
+                          )}
+                        </div>
+                        <div className="p-3 space-y-2">
+                          <p className="text-xs truncate text-foreground">{item.file.name}</p>
+                          <p className="text-xs text-muted-foreground">{formatBytes(item.file.size)}</p>
+                          {item.status === 'working' && <Progress value={item.progress} className="h-1" />}
+                          <div className="flex items-center justify-between">
+                            {item.status === 'done' ? (
+                              <span className="text-xs text-green-500 flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" /> gata
+                              </span>
+                            ) : item.status === 'error' ? (
+                              <span className="text-xs text-destructive flex items-center gap-1">
+                                <XCircle className="w-3 h-3" /> {item.error?.slice(0, 24)}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">în așteptare</span>
+                            )}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7"
+                              onClick={() => removeFromQueue(item.id)}
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={uploadAll}
+                      disabled={uploading || pendingCount === 0}
+                      className="bg-gradient-to-r from-primary to-accent text-white"
+                    >
+                      {uploading ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : (
+                        <Upload className="w-4 h-4 mr-2" />
+                      )}
+                      Încarcă {pendingCount > 0 ? `(${pendingCount})` : ''}
+                    </Button>
+                    <Button variant="ghost" onClick={clearFinished} disabled={uploading}>
+                      Curăță lista
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto] items-end border-t border-border/50 pt-5">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Titlu video</label>
+                  <Input value={videoTitle} onChange={(e) => setVideoTitle(e.target.value)} placeholder="Nuntă la Palas" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Categorie</label>
-                  <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="nunti" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Poză sau video (fișier)</label>
-                  <Input
-                    id="gallery-file"
-                    type="file"
-                    accept="image/*,video/*"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">sau link video (YouTube / Facebook)</label>
+                  <label className="text-sm font-medium text-foreground">Link video (YouTube / Facebook)</label>
                   <Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://..." />
                 </div>
-                <div className="md:col-span-2">
-                  <Button type="submit" disabled={uploading} className="bg-gradient-to-r from-primary to-accent text-white">
-                    {uploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
-                    Adaugă
-                  </Button>
-                </div>
-              </form>
+                <Button variant="outline" onClick={addVideoLink}>
+                  <Link2 className="w-4 h-4 mr-2" /> Adaugă link
+                </Button>
+              </div>
             </Card>
 
             {galleryQuery.isLoading ? (
@@ -250,25 +549,138 @@ const AdminPanel = () => {
                 {(galleryQuery.data ?? []).map((item) => (
                   <Card key={item.id} className="overflow-hidden bg-card/50">
                     <div className="aspect-square bg-secondary/30 flex items-center justify-center overflow-hidden">
-                      {item.type === 'image' && item.displayUrl ? (
-                        <img src={item.displayUrl} alt={item.title} className="w-full h-full object-cover" />
+                      {item.type === 'image' && item.thumbUrl ? (
+                        <img src={item.thumbUrl} alt={item.title} loading="lazy" className="w-full h-full object-cover" />
                       ) : (
                         <span className="text-xs text-muted-foreground px-2 text-center break-all">VIDEO</span>
                       )}
                     </div>
                     <div className="p-3 space-y-2">
-                      <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline">{item.category}</Badge>
+                      <Input
+                        defaultValue={item.title}
+                        className="h-8 text-sm"
+                        onBlur={(e) =>
+                          e.target.value !== item.title &&
+                          updateGalleryItem(item.id, { title: e.target.value })
+                        }
+                      />
+                      <div className="flex items-center justify-between gap-2">
+                        <select
+                          defaultValue={item.category}
+                          onChange={(e) => updateGalleryItem(item.id, { category: e.target.value })}
+                          className="h-8 rounded-md bg-secondary/40 border border-border text-xs px-2 text-foreground"
+                        >
+                          {Array.from(new Set([...CATEGORIES, item.category])).map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                        </select>
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => deleteItem(item.id, item.src ?? item.video_url)}
+                          onClick={() => deleteItem(item.id, [item.src, item.video_url, item.thumb_path])}
                         >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
                     </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* RECENZII */}
+          <TabsContent value="recenzii" className="space-y-6">
+            <Card className="p-6 space-y-4 bg-card/50">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-heading font-bold text-foreground">Recenzii Facebook</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Aduce automat recenziile de pe pagina ta și le afișează pe site.
+                  </p>
+                </div>
+                <Button onClick={syncFacebook} disabled={syncing} variant="outline">
+                  {syncing ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                  )}
+                  Sincronizează acum
+                </Button>
+              </div>
+            </Card>
+
+            <Card className="p-6 space-y-4 bg-card/50">
+              <h2 className="text-lg font-heading font-bold text-foreground">Adaugă recenzie manual</h2>
+              <div className="grid gap-3 md:grid-cols-3">
+                <Input
+                  placeholder="Nume client"
+                  value={newReview.author_name}
+                  onChange={(e) => setNewReview({ ...newReview, author_name: e.target.value })}
+                />
+                <Input
+                  placeholder="Tip eveniment (ex: Nuntă)"
+                  value={newReview.role}
+                  onChange={(e) => setNewReview({ ...newReview, role: e.target.value })}
+                />
+                <select
+                  value={newReview.rating}
+                  onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
+                  className="h-10 rounded-md bg-secondary/40 border border-border px-3 text-sm text-foreground"
+                >
+                  {[5, 4, 3, 2, 1].map((n) => (
+                    <option key={n} value={n}>
+                      {n} stele
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Textarea
+                rows={4}
+                placeholder="Textul recenziei"
+                value={newReview.content}
+                onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
+              />
+              <Button onClick={addReview} className="bg-gradient-to-r from-primary to-accent text-white">
+                <Plus className="w-4 h-4 mr-2" /> Adaugă recenzie
+              </Button>
+            </Card>
+
+            {reviewsQuery.isLoading ? (
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            ) : (
+              <div className="space-y-3">
+                {(reviewsQuery.data ?? []).map((item) => (
+                  <Card key={item.id} className="p-5 space-y-3 bg-card/50">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <p className="font-medium text-foreground">{item.author_name}</p>
+                        {item.rating && (
+                          <span className="flex items-center gap-0.5 text-yellow-400">
+                            {Array.from({ length: item.rating }).map((_, i) => (
+                              <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                            ))}
+                          </span>
+                        )}
+                        <Badge variant="outline">{item.source}</Badge>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          {item.is_visible ? (
+                            <Eye className="w-4 h-4 text-primary" />
+                          ) : (
+                            <EyeOff className="w-4 h-4 text-muted-foreground" />
+                          )}
+                          <Switch checked={item.is_visible} onCheckedChange={() => toggleReview(item)} />
+                        </div>
+                        <Button size="icon" variant="ghost" onClick={() => deleteReview(item.id)}>
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">{item.content}</p>
                   </Card>
                 ))}
               </div>
