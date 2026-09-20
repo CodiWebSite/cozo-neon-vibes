@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { z } from 'zod';
+
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,6 +24,10 @@ import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [website, setWebsite] = useState(''); // honeypot – invisible to real users
+  const formLoadedAt = useRef(Date.now());
+  const lastSentAt = useRef<number>(0);
+
   const { toast } = useToast();
   const { t } = useSiteContent();
 
@@ -52,25 +58,114 @@ const Contact = () => {
     });
   };
 
+  const contactSchema = z.object({
+    name: z.string().trim().min(2, 'Te rog scrie numele tău complet.').max(100, 'Numele este prea lung.'),
+    email: z.string().trim().email('Adresa de email nu pare corectă.').max(255, 'Emailul este prea lung.'),
+    phone: z
+      .string()
+      .trim()
+      .max(30, 'Numărul de telefon este prea lung.')
+      .regex(/^[0-9+()\-\s.]*$/, 'Numărul de telefon conține caractere nepermise.')
+      .optional()
+      .or(z.literal('')),
+    event_type: z.string().trim().max(50),
+    event_date: z.string().trim().max(30).optional().or(z.literal('')),
+    message: z
+      .string()
+      .trim()
+      .min(10, 'Scrie te rog câteva detalii despre eveniment (minim 10 caractere).')
+      .max(2000, 'Mesajul este prea lung (maxim 2000 de caractere).'),
+  });
+
+  const errorMessage = (raw: string) => {
+    if (raw.includes('rate_limited')) return 'Ai trimis deja câteva mesaje recent. Te rog încearcă din nou peste o oră sau scrie-mi pe WhatsApp.';
+    if (raw.includes('spam_detected')) return 'Mesajul conține prea multe linkuri. Te rog rescrie-l fără linkuri.';
+    if (raw.includes('invalid_email')) return 'Adresa de email nu pare corectă.';
+    if (raw.includes('invalid_message')) return 'Mesajul este prea scurt sau prea lung.';
+    if (raw.includes('invalid_name')) return 'Te rog scrie numele tău complet.';
+    if (raw.includes('invalid_phone')) return 'Numărul de telefon nu pare corect.';
+    return 'Te rog să încerci din nou sau să mă contactezi direct pe WhatsApp.';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 1. honeypot – only bots fill this hidden field
+    if (website.trim() !== '') return;
+
+    // 2. time trap – forms submitted in under 3 seconds are almost always bots
+    if (Date.now() - formLoadedAt.current < 3000) {
+      toast({
+        title: 'Puțin prea repede',
+        description: 'Te rog verifică datele și trimite din nou în câteva secunde.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // 3. local cooldown – max one message per 30 seconds from this browser
+    if (Date.now() - lastSentAt.current < 30000) {
+      toast({
+        title: 'Mesaj deja trimis',
+        description: 'Am primit mesajul tău. Te rog așteaptă puțin înainte să trimiți altul.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const parsed = contactSchema.safeParse(formData);
+    if (!parsed.success) {
+      toast({
+        title: 'Verifică datele completate',
+        description: parsed.error.issues[0]?.message ?? 'Te rog completează corect formularul.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('contact_messages').insert({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || null,
-        event_type: formData.event_type || null,
-        event_date: formData.event_date || null,
-        message: formData.message,
-      });
+      const values = parsed.data;
+      const { data: inserted, error } = await supabase
+        .from('contact_messages')
+        .insert({
+          name: values.name,
+          email: values.email,
+          phone: values.phone || null,
+          event_type: values.event_type || null,
+          event_date: values.event_date || null,
+          message: values.message,
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
+      lastSentAt.current = Date.now();
+
+      // automatic confirmation email for the client (silent if email sending isn't active yet)
+      try {
+        await supabase.functions.invoke('send-transactional-email', {
+          body: {
+            templateName: 'contact-confirmation',
+            recipientEmail: values.email,
+            idempotencyKey: `contact-confirmation-${inserted?.id}`,
+            templateData: {
+              name: values.name,
+              eventType: values.event_type || null,
+              eventDate: values.event_date || null,
+              message: values.message,
+            },
+          },
+        });
+      } catch {
+        /* confirmation email is optional – the message is already saved */
+      }
+
       toast({
-        title: "Mesaj trimis cu succes!",
-        description: "Îți voi răspunde în cel mai scurt timp posibil.",
+        title: 'Mesaj trimis cu succes!',
+        description: 'Ți-am trimis și un email de confirmare. Îți răspund în cel mai scurt timp.',
       });
       setFormData({
         name: '',
@@ -80,16 +175,18 @@ const Contact = () => {
         event_date: '',
         message: ''
       });
+      formLoadedAt.current = Date.now();
     } catch (error) {
       toast({
-        title: "Eroare la trimiterea mesajului",
-        description: "Te rog să încerci din nou sau să mă contactezi direct.",
-        variant: "destructive"
+        title: 'Eroare la trimiterea mesajului',
+        description: errorMessage(error instanceof Error ? error.message : String(error)),
+        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   const contactInfoDisplay = [
     {
@@ -243,6 +340,21 @@ const Contact = () => {
                     className="bg-background/50 border-border focus:neon-border resize-none"
                   />
                 </div>
+
+                {/* honeypot – hidden from real users, bots fill it in */}
+                <div aria-hidden="true" className="absolute left-[-9999px] top-auto w-px h-px overflow-hidden">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </div>
+
 
                 <Button
                   type="submit"
