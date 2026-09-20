@@ -203,6 +203,7 @@ export type Database = {
     }
     Functions: {
       claim_admin_if_none: { Args: never; Returns: boolean }
+      grant_admin_by_email: { Args: { _email: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -210,6 +211,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_admins: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          user_id: string
+        }[]
+      }
+      revoke_admin: { Args: { _user_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
