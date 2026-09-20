@@ -795,15 +795,23 @@ const AdminPanel = () => {
                         <div className="p-3 space-y-2">
                           <p className="text-xs truncate text-foreground">{item.file.name}</p>
                           <p className="text-xs text-muted-foreground">{formatBytes(item.file.size)}</p>
-                          {item.status === 'working' && <Progress value={item.progress} className="h-1" />}
-                          <div className="flex items-center justify-between">
+                          <Progress
+                            value={item.status === 'done' ? 100 : item.progress}
+                            className="h-1.5"
+                          />
+                          <div className="flex items-center justify-between gap-2">
                             {item.status === 'done' ? (
                               <span className="text-xs text-green-500 flex items-center gap-1">
                                 <CheckCircle2 className="w-3 h-3" /> gata
                               </span>
                             ) : item.status === 'error' ? (
-                              <span className="text-xs text-destructive flex items-center gap-1">
-                                <XCircle className="w-3 h-3" /> {item.error?.slice(0, 24)}
+                              <span className="text-xs text-destructive flex items-center gap-1 truncate">
+                                <XCircle className="w-3 h-3 shrink-0" /> {item.error}
+                              </span>
+                            ) : item.status === 'working' ? (
+                              <span className="text-xs text-primary truncate">
+                                {item.progress}%
+                                {item.attempt && item.attempt > 1 ? ` · reîncercare ${item.attempt}/3` : ''}
                               </span>
                             ) : (
                               <span className="text-xs text-muted-foreground">în așteptare</span>
@@ -861,49 +869,13 @@ const AdminPanel = () => {
             ) : (galleryQuery.data ?? []).length === 0 ? (
               <p className="text-muted-foreground">Galeria este goală. Adaugă primele poze mai sus.</p>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {(galleryQuery.data ?? []).map((item) => (
-                  <Card key={item.id} className="overflow-hidden bg-card/50">
-                    <div className="aspect-square bg-secondary/30 flex items-center justify-center overflow-hidden">
-                      {item.type === 'image' && item.thumbUrl ? (
-                        <img src={item.thumbUrl} alt={item.title} loading="lazy" className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-xs text-muted-foreground px-2 text-center break-all">VIDEO</span>
-                      )}
-                    </div>
-                    <div className="p-3 space-y-2">
-                      <Input
-                        defaultValue={item.title}
-                        className="h-8 text-sm"
-                        onBlur={(e) =>
-                          e.target.value !== item.title &&
-                          updateGalleryItem(item.id, { title: e.target.value })
-                        }
-                      />
-                      <div className="flex items-center justify-between gap-2">
-                        <select
-                          defaultValue={item.category}
-                          onChange={(e) => updateGalleryItem(item.id, { category: e.target.value })}
-                          className="h-8 rounded-md bg-secondary/40 border border-border text-xs px-2 text-foreground"
-                        >
-                          {Array.from(new Set([...CATEGORIES, item.category])).map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
-                          ))}
-                        </select>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => deleteItem(item.id, [item.src, item.video_url, item.thumb_path])}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+              <SortableGalleryGrid
+                items={galleryQuery.data ?? []}
+                categories={CATEGORIES}
+                onUpdate={updateGalleryItem}
+                onDelete={deleteItem}
+                onReorder={reorderGallery}
+              />
             )}
           </TabsContent>
 
