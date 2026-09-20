@@ -460,7 +460,9 @@ const AdminPanel = () => {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="admini">Administratori</TabsTrigger>
           </TabsList>
+
 
           {/* GALERIE */}
           <TabsContent value="galerie" className="space-y-6">
