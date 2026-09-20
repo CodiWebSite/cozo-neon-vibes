@@ -325,6 +325,18 @@ const AdminPanel = () => {
     refreshReviews();
   };
 
+  const [editingName, setEditingName] = useState<{ id: string; value: string } | null>(null);
+
+  const saveReviewName = async () => {
+    if (!editingName) return;
+    const value = editingName.value.trim();
+    if (!value) return;
+    await supabase.from('testimonials').update({ author_name: value }).eq('id', editingName.id);
+    setEditingName(null);
+    refreshReviews();
+  };
+
+
   /* ---------------- Conținut ---------------- */
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
@@ -827,7 +839,32 @@ const AdminPanel = () => {
                   <Card key={item.id} className="p-5 space-y-3 bg-card/50">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <p className="font-medium text-foreground">{item.author_name}</p>
+                        {editingName?.id === item.id ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              autoFocus
+                              value={editingName.value}
+                              onChange={(e) => setEditingName({ id: item.id, value: e.target.value })}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveReviewName();
+                                if (e.key === 'Escape') setEditingName(null);
+                              }}
+                              className="h-8 w-48"
+                            />
+                            <Button size="sm" onClick={saveReviewName}>Salvează</Button>
+                            <Button size="sm" variant="ghost" onClick={() => setEditingName(null)}>Renunță</Button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setEditingName({ id: item.id, value: item.author_name })}
+                            className="font-medium text-foreground hover:text-primary transition-colors underline-offset-4 hover:underline"
+                            title="Click pentru a schimba numele"
+                          >
+                            {item.author_name}
+                          </button>
+                        )}
+
                         {item.rating && (
                           <span className="flex items-center gap-0.5 text-yellow-400">
                             {Array.from({ length: item.rating }).map((_, i) => (
