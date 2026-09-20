@@ -423,8 +423,105 @@ const AdminPanel = () => {
     queryClient.invalidateQueries({ queryKey: ['admin_admins'] });
   };
 
+  /* ---------------- Invitații ---------------- */
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviting, setInviting] = useState(false);
+  const [lastInviteLink, setLastInviteLink] = useState<{ email: string; url: string; emailed: boolean } | null>(null);
+
+  const invitationsQuery = useQuery({
+    queryKey: ['admin_invitations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_invitations')
+        .select('id, email, status, expires_at, created_at, accepted_at, email_sent_at')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const sendInvite = async () => {
+    const email = inviteEmail.trim();
+    if (!email) return;
+    setInviting(true);
+    const { data, error } = await supabase.rpc('create_admin_invitation', { _email: email });
+    const result = (data ?? {}) as { ok?: boolean; error?: string; token?: string; id?: string };
+
+    if (error || !result.ok) {
+      setInviting(false);
+      const map: Record<string, string> = {
+        already_admin: 'Această persoană este deja administrator.',
+        invalid_email: 'Adresa de email nu pare corectă.',
+        not_authorized: 'Nu ai dreptul să trimiți invitații.',
+      };
+      toast({
+        title: 'Invitația nu a fost creată',
+        description: map[result.error ?? ''] ?? error?.message ?? 'Încearcă din nou.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const url = `${window.location.origin}/admin/invitatie?token=${result.token}`;
+
+    let emailed = false;
+    try {
+      const { error: mailError } = await supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'admin-invitation',
+          recipientEmail: email,
+          idempotencyKey: `admin-invite-${result.id}`,
+          templateData: { inviteUrl: url },
+        },
+      });
+      emailed = !mailError;
+    } catch {
+      emailed = false;
+    }
+
+    if (emailed) {
+      await supabase.from('admin_invitations').update({ email_sent_at: new Date().toISOString() }).eq('id', result.id!);
+    }
+
+    setInviting(false);
+    setInviteEmail('');
+    setLastInviteLink({ email, url, emailed });
+    toast({
+      title: emailed ? 'Invitație trimisă pe email' : 'Invitație creată',
+      description: emailed ? email : 'Trimiterea pe email nu este încă activă — copiază linkul de mai jos.',
+    });
+    queryClient.invalidateQueries({ queryKey: ['admin_invitations'] });
+  };
+
+  const revokeInvite = async (id: string) => {
+    const { data, error } = await supabase.rpc('revoke_admin_invitation', { _id: id });
+    const result = (data ?? {}) as { ok?: boolean; error?: string };
+    if (error || !result.ok) {
+      toast({
+        title: 'Nu am putut anula invitația',
+        description: error?.message ?? 'Invitația nu mai este în așteptare.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    toast({ title: 'Invitație anulată' });
+    queryClient.invalidateQueries({ queryKey: ['admin_invitations'] });
+  };
+
+  const inviteStatusLabel = (status: string, expiresAt: string) => {
+    if (status === 'pending' && new Date(expiresAt) < new Date()) return { label: 'Expirată', tone: 'outline' as const };
+    const map: Record<string, { label: string; tone: 'default' | 'outline' | 'secondary' }> = {
+      pending: { label: 'În așteptare', tone: 'default' },
+      accepted: { label: 'Acceptată', tone: 'secondary' },
+      revoked: { label: 'Anulată', tone: 'outline' },
+      expired: { label: 'Expirată', tone: 'outline' },
+    };
+    return map[status] ?? { label: status, tone: 'outline' as const };
+  };
+
   const sections = Array.from(new Set((contentQuery.data ?? []).map((row) => row.section)));
   const pendingCount = queue.filter((i) => i.status === 'pending' || i.status === 'error').length;
+
 
 
   return (
@@ -880,7 +977,79 @@ const AdminPanel = () => {
                 ))
               )}
             </div>
+
+            <Card className="p-6 space-y-4 bg-card/50">
+              <div>
+                <h3 className="font-heading font-semibold text-foreground">Invită un administrator nou</h3>
+                <p className="text-sm text-muted-foreground">
+                  Trimite o invitație pe email. Persoana își alege singură parola și primește acces automat.
+                  Invitația este valabilă 7 zile și o poți anula oricând până când e folosită.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Input
+                  type="email"
+                  placeholder="email@exemplu.ro"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  className="max-w-xs"
+                />
+                <Button onClick={sendInvite} disabled={inviting || !inviteEmail.trim()}>
+                  {inviting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Mail className="w-4 h-4 mr-2" />}
+                  Trimite invitația
+                </Button>
+              </div>
+
+              {lastInviteLink && (
+                <div className="rounded-lg border border-border/60 bg-background/40 p-4 space-y-2">
+                  <p className="text-sm text-foreground">
+                    {lastInviteLink.emailed
+                      ? `Invitație trimisă către ${lastInviteLink.email}. Poți folosi și linkul de mai jos:`
+                      : `Trimite manual acest link către ${lastInviteLink.email}:`}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Input readOnly value={lastInviteLink.url} className="flex-1 min-w-[240px] text-xs" />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(lastInviteLink.url);
+                        toast({ title: 'Link copiat' });
+                      }}
+                    >
+                      Copiază linkul
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+
+            <div className="space-y-3">
+              {(invitationsQuery.data ?? []).map((invite) => {
+                const status = inviteStatusLabel(invite.status, invite.expires_at);
+                return (
+                  <Card key={invite.id} className="p-4 flex flex-wrap items-center justify-between gap-3 bg-card/50">
+                    <div>
+                      <p className="font-medium text-foreground">{invite.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Trimisă {new Date(invite.created_at).toLocaleDateString('ro-RO')} · expiră{' '}
+                        {new Date(invite.expires_at).toLocaleDateString('ro-RO')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={status.tone === 'default' ? undefined : status.tone}>{status.label}</Badge>
+                      {invite.status === 'pending' && (
+                        <Button size="sm" variant="ghost" onClick={() => revokeInvite(invite.id)}>
+                          <XCircle className="w-4 h-4 text-destructive mr-2" /> Anulează
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           </TabsContent>
+
         </Tabs>
 
       </main>
