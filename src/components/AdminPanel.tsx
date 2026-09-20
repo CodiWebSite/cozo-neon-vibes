@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { resolveGalleryItems, type GalleryRow } from '@/lib/galleryUrls';
 import { prepareImage, prepareVideoPoster, formatBytes } from '@/lib/imageUpload';
+import { uploadWithProgress, withRetry } from '@/lib/uploadWithProgress';
+import SortableGalleryGrid from '@/components/admin/SortableGalleryGrid';
 import {
   Loader2, Trash2, Upload, LogOut, Save, Mail, ExternalLink,
   ImagePlus, Link2, RefreshCw, Star, Eye, EyeOff, Plus, CheckCircle2, XCircle,
@@ -53,6 +55,7 @@ interface QueueItem {
   status: QueueStatus;
   progress: number;
   error?: string;
+  attempt?: number;
 }
 
 const CATEGORIES = ['nunti', 'corporate', 'club', 'private', 'general'];
