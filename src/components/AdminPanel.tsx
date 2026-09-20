@@ -1012,7 +1012,7 @@ const AdminPanel = () => {
             ) : (
               <SortableGalleryGrid
                 items={galleryQuery.data ?? []}
-                categories={CATEGORIES}
+                categories={categories}
                 onUpdate={updateGalleryItem}
                 onDelete={deleteItem}
                 onReorder={reorderGallery}
