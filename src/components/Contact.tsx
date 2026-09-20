@@ -315,7 +315,7 @@ const Contact = () => {
                   </p>
                   <Button
                     className="bg-green-600 hover:bg-green-700 text-white hover:scale-105 smooth-transition glow-effect"
-                    onClick={() => window.open(`https://wa.me/40749800325?text=${whatsappMessage}`, '_blank')}
+                    onClick={() => window.open(`https://wa.me/${contactData.whatsapp}?text=${whatsappMessage}`, '_blank')}
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Scrie pe WhatsApp
