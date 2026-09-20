@@ -107,7 +107,7 @@ const Contact = () => {
     {
       icon: MapPin,
       title: "Locație",
-      detail: "Iași, România",
+      detail: contactData.location,
       action: null
     },
     {
