@@ -108,10 +108,10 @@ const Packages = () => {
             {t('packages_badge', 'Pachete Disponibile')}
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6">
-            {t('packages_title', 'Alege')} <span className="gradient-text">{t('packages_title_accent', 'Pachetul')}</span> {t('packages_title_suffix', 'Perfect')}
+            {t('packages_title', 'Alege')} <span className="gradient-text">{t('packages_title_accent', 'Pachetul')}</span> {t('packages_title_suffix', 'Perfect - Prețuri DJ Iași')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {t('packages_subtitle', 'Pachete complete adaptate pentru orice tip de eveniment. Servicii profesionale cu echipament, transport și setup inclus.')}
+            {t('packages_subtitle', 'Pachete și prețuri DJ pentru nuntă, botez sau eveniment corporate în Iași. Servicii profesionale cu echipament, transport și setup inclus.')}
           </p>
         </div>
 

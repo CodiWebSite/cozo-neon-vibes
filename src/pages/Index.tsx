@@ -13,16 +13,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>DJ Cozo | DJ Iași - Nunți, Evenimente Corporate, Petreceri Private</title>
+        <title>DJ Cozo | DJ Nuntă Iași - Pachete și Prețuri DJ Evenimente</title>
         <meta
           name="description"
-          content="DJ Cozo - DJ profesionist în Iași. Servicii DJ pentru nunți, evenimente corporate, petreceri private și cluburi. Echipamente premium, experiență 12+ ani. Rezervă acum!"
+          content="DJ Cozo - DJ profesionist în Iași. Vezi pachetele și prețurile pentru DJ nuntă, evenimente corporate, petreceri private și cluburi. Experiență 12+ ani. Cere ofertă!"
         />
         <link rel="canonical" href="https://dj-cozo.ro/" />
-        <meta property="og:title" content="DJ Cozo | DJ Iași - Nunți, Evenimente Corporate, Petreceri Private" />
+        <meta property="og:title" content="DJ Cozo | DJ Nuntă Iași - Pachete și Prețuri DJ Evenimente" />
         <meta
           property="og:description"
-          content="DJ Cozo - DJ profesionist în Iași. Servicii DJ pentru nunți, evenimente corporate, petreceri private și cluburi. Echipamente premium, experiență 12+ ani."
+          content="DJ Cozo - DJ profesionist în Iași. Vezi pachetele și prețurile pentru DJ nuntă, evenimente corporate, petreceri private și cluburi. Experiență 12+ ani. Cere ofertă!"
         />
         <meta property="og:url" content="https://dj-cozo.ro/" />
       </Helmet>
