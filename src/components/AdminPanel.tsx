@@ -350,6 +350,14 @@ const AdminPanel = () => {
   };
 
   const removeCategory = async (name: string) => {
+    if (name === 'general') {
+      toast({
+        title: 'Categoria „general" nu poate fi ștearsă',
+        description: 'Este categoria de rezervă pentru poze și clipuri.',
+        variant: 'destructive',
+      });
+      return;
+    }
     const used = (galleryQuery.data ?? []).some((item) => item.category === name);
     if (used) {
       toast({
@@ -361,6 +369,31 @@ const AdminPanel = () => {
     }
     const ok = await saveCategories(categories.filter((c) => c !== name));
     if (ok && category === name) setCategory('general');
+    if (ok) toast({ title: `Categoria „${name}" a fost ștearsă` });
+  };
+
+  const renameCategory = async (oldName: string, rawName: string) => {
+    const name = rawName.trim().toLowerCase();
+    setEditingCategory(null);
+    if (!name || name === oldName) return;
+    if (categories.includes(name)) {
+      toast({ title: 'Există deja o categorie cu acest nume', variant: 'destructive' });
+      return;
+    }
+    const ok = await saveCategories(categories.map((c) => (c === oldName ? name : c)));
+    if (!ok) return;
+
+    const { error } = await supabase
+      .from('gallery_items')
+      .update({ category: name })
+      .eq('category', oldName);
+    if (error) {
+      toast({ title: 'Nu am putut muta pozele în categoria redenumită', description: error.message, variant: 'destructive' });
+      return;
+    }
+    refreshGallery();
+    if (category === oldName) setCategory(name);
+    toast({ title: `Categoria se numește acum „${name}"` });
   };
 
   const reorderGallery = async (orderedIds: string[]) => {
