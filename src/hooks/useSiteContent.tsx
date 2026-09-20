@@ -35,5 +35,16 @@ export const useSiteContent = () => {
     return value && value.trim().length > 0 ? value : fallback;
   };
 
-  return { t, isLoading };
+  /** Listă: valoarea are câte un element pe fiecare rând */
+  const tl = (key: string, fallback: string[]) => {
+    const value = map.get(key);
+    if (!value || value.trim().length === 0) return fallback;
+    const items = value
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+    return items.length > 0 ? items : fallback;
+  };
+
+  return { t, tl, isLoading };
 };
