@@ -187,8 +187,8 @@ const Gallery = () => {
 
         {isLightboxOpen && selectedItem !== null && galleryItems[selectedItem] && (
           <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
-            <DialogContent className="max-w-4xl w-full h-[90vh] bg-black border-gray-800 p-0">
-              <div className="relative w-full h-full flex items-center justify-center">
+            <DialogContent className="max-w-3xl w-[94vw] h-auto max-h-[88svh] bg-black border-gray-800 p-0 overflow-hidden">
+              <div className="relative w-full flex items-center justify-center">
                 <button
                   onClick={closeLightbox}
                   className="absolute top-4 right-4 z-10 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
