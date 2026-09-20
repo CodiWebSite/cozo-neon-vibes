@@ -341,6 +341,21 @@ const Contact = () => {
                   />
                 </div>
 
+                {/* honeypot – hidden from real users, bots fill it in */}
+                <div aria-hidden="true" className="absolute left-[-9999px] top-auto w-px h-px overflow-hidden">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </div>
+
+
                 <Button
                   type="submit"
                   disabled={isSubmitting}
