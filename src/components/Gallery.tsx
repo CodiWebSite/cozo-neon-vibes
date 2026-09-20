@@ -201,6 +201,7 @@ const Gallery = () => {
               <div className="relative w-full flex items-center justify-center">
                 <button
                   onClick={closeLightbox}
+                  aria-label="Închide"
                   className="absolute top-4 right-4 z-10 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
                 >
                   <X className="w-6 h-6" />
@@ -208,6 +209,7 @@ const Gallery = () => {
 
                 <button
                   onClick={prevItem}
+                  aria-label="Elementul anterior"
                   className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
                 >
                   <ChevronLeft className="w-6 h-6" />
@@ -215,6 +217,7 @@ const Gallery = () => {
 
                 <button
                   onClick={nextItem}
+                  aria-label="Elementul următor"
                   className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
                 >
                   <ChevronRight className="w-6 h-6" />

@@ -40,7 +40,7 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="space-y-6">
             <div className="flex items-center">
-              <img src={logoImg} alt="DJ Cozo Logo" className="h-20 w-auto mb-4" />
+              <img src={logoImg} alt="DJ Cozo - DJ profesionist pentru nunți și evenimente în Iași" className="h-20 w-auto mb-4" />
             </div>
             
             <p className="text-muted-foreground leading-relaxed">
