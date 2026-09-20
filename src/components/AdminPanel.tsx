@@ -774,24 +774,62 @@ const AdminPanel = () => {
           {/* GALERIE */}
           <TabsContent value="galerie" className="space-y-6">
             <Card className="p-6 space-y-5 bg-card/50">
-              <div className="flex flex-wrap items-end gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Categorie pentru încărcare</label>
-                  <div className="flex flex-wrap gap-2">
-                    {CATEGORIES.map((c) => (
-                      <Badge
-                        key={c}
-                        onClick={() => setCategory(c)}
-                        className={`cursor-pointer ${
-                          category === c
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-secondary text-muted-foreground'
-                        }`}
-                      >
-                        {c}
-                      </Badge>
-                    ))}
-                  </div>
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-foreground">Categorie pentru încărcare</label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((c) => (
+                    <Badge
+                      key={c}
+                      onClick={() => setCategory(c)}
+                      className={`cursor-pointer group gap-1 ${
+                        category === c
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary text-muted-foreground'
+                      }`}
+                    >
+                      {c}
+                      {!DEFAULT_CATEGORIES.includes(c) && (
+                        <button
+                          type="button"
+                          aria-label={`Șterge categoria ${c}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeCategory(c);
+                          }}
+                          className="opacity-70 hover:opacity-100"
+                        >
+                          <XCircle className="w-3 h-3" />
+                        </button>
+                      )}
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <Input
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCategory();
+                      }
+                    }}
+                    placeholder="Categorie nouă (ex: botez)"
+                    className="h-9 w-full sm:w-64"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addCategory}
+                    disabled={savingCategories || !newCategory.trim()}
+                  >
+                    {savingCategories ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4 mr-2" />
+                    )}
+                    Adaugă categorie
+                  </Button>
                 </div>
               </div>
 
