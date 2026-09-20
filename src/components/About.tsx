@@ -92,13 +92,13 @@ const About = () => {
               <img 
                 src={djPortrait} 
                 alt="DJ Cozo - DJ profesionist cu experiență în Iași, specializat în nunți și evenimente" 
-                className="w-full h-[600px] object-cover"
+                className="w-full h-[380px] sm:h-[500px] lg:h-[600px] object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             </div>
             
             {/* Floating Element */}
-            <div className="absolute -bottom-6 -right-6 bg-gradient-to-r from-cyan-400 to-purple-400 p-6 rounded-2xl shadow-2xl">
+            <div className="absolute bottom-4 right-4 lg:-bottom-6 lg:-right-6 bg-gradient-to-r from-cyan-400 to-purple-400 p-4 lg:p-6 rounded-2xl shadow-2xl">
               <div className="text-center">
                 <div className="text-2xl font-bold text-black">{t('about_badge_name', 'DJ COZO')}</div>
                 <div className="text-sm text-black/80">{t('about_badge_role', 'Professional DJ')}</div>
