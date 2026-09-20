@@ -299,3 +299,20 @@
     }
   }
 }
+
+/* Ancorele din meniu nu mai intră sub header-ul fix */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+@media (min-width: 1024px) {
+  section[id] {
+    scroll-margin-top: 6rem;
+  }
+}
+
+/* Evită depășirea pe orizontală pe telefoane */
+html,
+body {
+  overflow-x: hidden;
+}
